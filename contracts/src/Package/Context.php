@@ -33,6 +33,6 @@ interface Context
 
     public function now(): DateTimeImmutable;
 
-    /** The public base URL of the core, e.g. "https://hub.sossiogll.com". */
+    /** The public base URL of the core, e.g. "https://hub.example.test". */
     public function publicUrl(): string;
 }

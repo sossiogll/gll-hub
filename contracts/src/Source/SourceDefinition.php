@@ -12,13 +12,13 @@ use Gll\Hub\Contracts\Package\Setting;
  * What a source is and can do, read by the core without calling it.
  *
  * A source can be configured several times: each configuration is an INSTANCE
- * ("the repo sossiogll/gll-cursor", "the Medium feed of @sossiogll"), with its own
+ * ("the feed of one author", "the feed of another"), with its own
  * values for $instanceSettings and $instanceCredentials.
  */
 final readonly class SourceDefinition
 {
     /**
-     * @param string $key stable identifier within the package, e.g. "repository"
+     * @param string $key stable identifier within the package, e.g. "feed"
      * @param list<string> $produces the content type keys its entries may have
      * @param list<Capability> $capabilities each one also implemented as its interface
      * @param list<Setting> $instanceSettings

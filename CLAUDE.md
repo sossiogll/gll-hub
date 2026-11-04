@@ -23,6 +23,9 @@ No package lives in the core, and no package name, content type key or integrati
 - A package depends on `gllhub/contracts` (and, for the types it produces, on the package that defines them). It
   never depends on the core.
 
+**A site is not a package either.** Its URLs, sections, components and design live in its frontend; the core and the
+contract never carry them ([ADR 0001](docs/adr/0001-where-the-shape-of-a-site-lives.md)).
+
 **A new ability** is a new optional interface in `gllhub/contracts` plus a `Capability` case, declared by the classes
 that have it. Never a method added to an existing interface, never an `instanceof` on a concrete package class.
 

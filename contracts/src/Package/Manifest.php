@@ -14,7 +14,7 @@ namespace Gll\Hub\Contracts\Package;
 final readonly class Manifest
 {
     /**
-     * @param string $name Composer-style name, e.g. "gllhub/medium"
+     * @param string $name Composer-style name, e.g. "acme/books"
      * @param string $contracts the version of gllhub/contracts the package was built on, e.g. "1.0"
      * @param array<value-of<Role>, list<class-string>> $provides the classes for each role
      * @param list<Setting> $settings package-wide settings

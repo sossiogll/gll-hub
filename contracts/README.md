@@ -24,14 +24,14 @@ its packages, the exceptions a package may throw on purpose, and the conformance
 | Role | Interface | Declares | Does |
 | --- | --- | --- | --- |
 | Package | `Package\Package` | `Manifest`: name, version, contracts, classes per role, settings, credentials | — |
-| Content type | `Content\ContentType` | `ContentTypeDefinition`: key, fields, comments, likes, feed, newsletter | nothing: pure schema |
+| Content type | `Content\ContentType` | `ContentTypeDefinition`: key, labels, fields | nothing: pure schema |
 | Source | `Source\Source` | `SourceDefinition`: key, produced types, capabilities, per-instance settings and credentials, interval | `pull()` every entry |
 | ↳ incremental | `Source\SyncsIncrementally` | `Capability::Incremental` | `pullSince(cursor)` → `SyncBatch` |
 | ↳ single fetch | `Source\FetchesSingleEntry` | `Capability::SingleFetch` | `fetch(externalId)`, null = gone |
 | Webhook | `Webhook\WebhookReceiver` | `WebhookDefinition`: key, sources it refreshes, secret | `verify()`, `handle()` → `SyncRequest`s |
 | Login | `Auth\AuthProvider` | `AuthDefinition`: key, settings, client credentials | `redirectUrl()`, `resolve()` → `ExternalIdentity` |
 
-**Fields.** The core owns title, slug, summary, body, language, author, dates, thumbnail, comments and likes. A
+**Fields.** The core owns title, slug, summary, body, language, author, dates and thumbnail. A
 content type declares only its own fields. A field is owned by the source (read-only in the admin, overwritten by
 every sync) unless it is `curated: true`, in which case the person owns it and a sync never touches it.
 

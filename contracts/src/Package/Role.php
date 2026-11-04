@@ -7,10 +7,10 @@ namespace Gll\Hub\Contracts\Package;
 /** What a class of a package is for. A package may provide several roles. */
 enum Role: string
 {
-    /** Defines a kind of content and its schema (project, idea, article…). */
+    /** Defines a kind of content and its schema (a book, an event…). */
     case ContentType = 'content_type';
 
-    /** Brings content in from somewhere else (a GitHub repo, a feed…). */
+    /** Brings content in from somewhere else (a repository, a feed…). */
     case Source = 'source';
 
     /** Receives calls from an outside service and says what to sync again. */
