@@ -7,7 +7,7 @@ namespace Gll\Hub\Contracts\Auth;
 use Gll\Hub\Contracts\Package\Credential;
 use Gll\Hub\Contracts\Package\Setting;
 
-/** A way to sign in, shown as a button on the sign-in page and in the comment box. */
+/** A way to sign in, shown as a button on the sign-in page. */
 final readonly class AuthDefinition
 {
     /**

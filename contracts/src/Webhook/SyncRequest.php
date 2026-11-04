@@ -12,7 +12,7 @@ final readonly class SyncRequest
 {
     /**
      * @param string $source a source key listed in WebhookDefinition::$refreshes
-     * @param array<string, scalar> $instance setting values that identify the instance(s), e.g. ["repository" => "sossiogll/gll-cursor"]
+     * @param array<string, scalar> $instance setting values that identify the instance(s), e.g. ["feed" => "https://example.test/feed"]
      * @param list<string> $externalIds only these entries (needs Capability::SingleFetch); empty = the whole instance
      */
     public function __construct(

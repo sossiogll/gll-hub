@@ -61,9 +61,6 @@ final class Article implements ContentType
                 new Field('related', 'Related', FieldType::Reference, references: ['article']),
                 new Field('sections', 'Sections', FieldType::List, of: [new Field('title', 'Title', FieldType::String)]),
             ],
-            inFeed: true,
-            notifiesSubscribers: true,
-            routePrefix: 'writing',
         );
     }
 }

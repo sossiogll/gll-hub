@@ -26,7 +26,7 @@ use Gll\Hub\Contracts\Webhook\WebhookReceiver;
  * The rules every package must follow, run by each package's own test suite:
  *
  *     Conformance::check(new MyPackage());
- *     Conformance::checkEntries(MySource::definition(), [Project::definition()], $sampleEntries);
+ *     Conformance::checkEntries(MySource::definition(), [Book::definition()], $sampleEntries);
  *
  * Both throw one ConformanceError listing every violation. A new generic rule goes
  * here, never in a package.

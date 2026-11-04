@@ -7,7 +7,7 @@ namespace Gll\Hub\Contracts\Source;
 /**
  * A link from an entry to another one, filled into a Reference field.
  * By external id within the same source instance, or by content type + slug
- * for anything else ("related: [gllHub]" in a showcase.md).
+ * for anything else (a name the source read from a file, say).
  */
 final readonly class ExternalRef
 {
