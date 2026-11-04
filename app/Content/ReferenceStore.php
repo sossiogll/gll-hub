@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Content;
 
+use App\Content\Rules\Slug;
 use App\Models\EntryReference;
 use Gll\Hub\Contracts\Source\ExternalRef;
 use Illuminate\Support\Facades\DB;
@@ -33,7 +34,8 @@ final class ReferenceStore
                 'position' => $position[$ref->field] = ($position[$ref->field] ?? -1) + 1,
                 'external_id' => $ref->externalId,
                 'type' => $ref->type,
-                'slug' => $ref->slug,
+                // A source may name its target as people write it; entries are stored under this form.
+                'slug' => $ref->slug === null ? null : Slug::from($ref->slug),
             ];
         }
 
