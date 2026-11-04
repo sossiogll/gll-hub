@@ -315,6 +315,18 @@ final class EntryUpsertTest extends HubTestCase
         $this->assertSame(['book', 'not-yet'], [$references[1]->type, $references[1]->slug]);
     }
 
+    public function test_a_reference_by_a_name_as_people_write_it_finds_the_entry_with_that_title(): void
+    {
+        $this->script->entries['catalog'] = [
+            Entries::book('1', 'First', ['references' => [new ExternalRef('related', type: 'book', slug: 'Later Book.org')]]),
+            Entries::book('9', 'Later Book.org'),
+        ];
+
+        $this->sync($this->makeInstance());
+
+        $this->assertSame(Entry::where('external_id', '9')->sole()->id, EntryReference::sole()->target_entry_id);
+    }
+
     public function test_an_unresolved_reference_is_resolved_by_a_later_run_even_from_another_source(): void
     {
         $this->script->entries['catalog'] = [
