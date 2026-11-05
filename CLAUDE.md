@@ -8,7 +8,7 @@ knows none of them by name.
 
 ## Where things live
 
-- **This repository** is the core (being rebuilt on the `next` branch; `master` still runs laravel-blog for
+- **This repository** is the core (being rebuilt on the `dev` branch; `master` still runs laravel-blog for
   b5srl.eu) and **`contracts/`**, the `gllhub/contracts` package: the only thing a package depends on. Core and
   contract change together, in the same pull request.
 - **[`sossiogll/gllhub-packages`](https://github.com/sossiogll/gllhub-packages)** holds the packages (types,

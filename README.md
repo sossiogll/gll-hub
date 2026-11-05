@@ -23,7 +23,7 @@ side by side (the stack mounts the sibling folder):
 git clone https://github.com/sossiogll/gll-hub.git
 git clone https://github.com/sossiogll/gllhub-packages.git
 cd gll-hub
-git checkout next
+git checkout dev
 docker compose -f docker-compose.dev.yml up
 ```
 
@@ -102,7 +102,7 @@ rewrites `composer.lock`; do not commit that change.
 
 `docker-compose.yml` builds nothing: it runs the image published to GitHub Container Registry
 (`ghcr.io/sossiogll/gllhub`), with MariaDB and Redis. `:X.Y.Z` is a release (tag `vX.Y.Z`), `:latest` follows
-`master`, and `:next` follows the `next` branch.
+`master`, and `:dev` follows the `dev` branch.
 
 ```sh
 cp .env.production.example .env      # then fill it in; the compose file refuses to start without the required values
