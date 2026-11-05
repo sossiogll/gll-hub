@@ -11,6 +11,9 @@ namespace Gll\Hub\Contracts\Content;
  * false (the default) = the source owns it, it is read-only in the admin and a sync
  * overwrites it; true = the person owns it, a sync never touches it (order, featured,
  * a shorter claim for cards…).
+ *
+ * $translatable says whether translations of an entry may differ on it. A curated field that is not translatable
+ * has one value for the whole content, whichever language it is edited in.
  */
 final readonly class Field
 {

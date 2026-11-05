@@ -52,6 +52,42 @@ final class RemoteMediaTest extends HubTestCase
             && $job->entryId === Entry::sole()->id);
     }
 
+    public function test_a_file_the_source_no_longer_names_goes_and_a_file_a_person_uploaded_stays(): void
+    {
+        Storage::fake('public');
+        Http::fake(['https://img.test/*' => Http::response(base64_decode(self::PNG), 200, ['Content-Type' => 'image/png'])]);
+        $instance = $this->makeInstance();
+        $version = fn (string $url, string $fingerprint) => Entries::book('1', 'Dune', ['media' => [new RemoteMedia('gallery', $url)], 'fingerprint' => $fingerprint]);
+
+        $this->script->entries['catalog'] = [$version('https://img.test/v1/a.png', 'one')];
+        $this->sync($instance);
+        $entry = Entry::sole();
+        $entry->addMediaFromString(base64_decode(self::PNG))->usingFileName('mine.png')->toMediaCollection('gallery');
+        $this->import($entry, new RemoteMedia('gallery', 'https://img.test/v1/a.png'));
+        $this->assertCount(2, $entry->fresh()->getMedia('gallery'));
+
+        $this->script->entries['catalog'] = [$version('https://img.test/v2/a.png', 'two')];
+        $this->sync($instance);
+
+        $urls = $entry->fresh()->getMedia('gallery')->map(fn ($m) => $m->getCustomProperty('source_url'))->all();
+        $this->assertNotContains('https://img.test/v1/a.png', $urls);
+        $this->assertContains(null, $urls, 'the file the person uploaded has no source URL and stays');
+    }
+
+    public function test_an_unchanged_entry_keeps_its_files(): void
+    {
+        Storage::fake('public');
+        Http::fake(['https://img.test/*' => Http::response(base64_decode(self::PNG), 200, ['Content-Type' => 'image/png'])]);
+        $instance = $this->makeInstance();
+        $this->script->entries['catalog'] = [Entries::book('1', 'Dune', ['media' => [new RemoteMedia('gallery', 'https://img.test/a.png')], 'fingerprint' => 'same'])];
+        $this->sync($instance);
+        $this->import(Entry::sole(), new RemoteMedia('gallery', 'https://img.test/a.png'));
+
+        $this->sync($instance);
+
+        $this->assertCount(1, Entry::sole()->getMedia('gallery'));
+    }
+
     public function test_the_job_travels_encrypted_because_its_headers_may_hold_a_token(): void
     {
         $this->assertInstanceOf(ShouldBeEncrypted::class, new ImportRemoteMedia(1, new RemoteMedia('cover', 'https://img.test/c.png')));

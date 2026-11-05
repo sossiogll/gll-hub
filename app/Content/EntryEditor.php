@@ -26,6 +26,7 @@ final class EntryEditor
         private readonly PackageRegistry $registry,
         private readonly SlugAllocator $slugs,
         private readonly ReferenceStore $references,
+        private readonly SharedCuration $curation,
     ) {
     }
 
@@ -71,6 +72,7 @@ final class EntryEditor
                 $entry->forceFill(['curated' => $this->values($definition, $entry->curated, $input->curated, true)])->save();
             }
             $this->link($entry, $definition, $input, $handWritten);
+            $this->curation->spreadFrom($entry, $definition);
 
             return $entry;
         });

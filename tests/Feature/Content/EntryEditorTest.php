@@ -40,6 +40,15 @@ final class EntryEditorTest extends HubTestCase
         ]));
     }
 
+    public function test_a_markdown_body_written_by_hand_keeps_its_comments(): void
+    {
+        $body = "Text.\n\n<!-- gll:demo -->\n";
+
+        $entry = $this->editor->create('book', $this->input(['body' => $body]), null);
+
+        $this->assertSame($body, $entry->fresh()->body);
+    }
+
     /** @return list<string> */
     private function violationsOf(callable $write): array
     {

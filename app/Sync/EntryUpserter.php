@@ -7,9 +7,12 @@ namespace App\Sync;
 use App\Content\EntryWriter;
 use App\Content\ImportRemoteMedia;
 use App\Content\ReferenceStore;
+use App\Content\RemoteMediaPruner;
 use App\Content\Rules\BodySanitizer;
 use App\Content\Rules\Slug;
+use App\Content\SharedCuration;
 use App\Content\WriteOutcome;
+use App\Models\Entry;
 use App\Models\SourceInstance;
 use App\Packages\PackageRegistry;
 use Gll\Hub\Contracts\Content\EntryRules;
@@ -31,6 +34,8 @@ final class EntryUpserter
         private readonly EntryWriter $writer,
         private readonly ReferenceStore $references,
         private readonly BodySanitizer $sanitizer,
+        private readonly SharedCuration $curation,
+        private readonly RemoteMediaPruner $pruner,
         private readonly LoggerInterface $logger,
     ) {
     }
@@ -64,6 +69,11 @@ final class EntryUpserter
         }
 
         $this->references->replace($id, $entry->references, $this->referenceFieldsOwnedBySource($entry->type));
+        if ($outcome === WriteOutcome::Created) {
+            $this->curation->inherit(Entry::findOrFail($id), $this->registry->contentType($entry->type));
+        } else {
+            $this->pruner->keepOnly($id, $entry->media);
+        }
         foreach ($entry->media as $media) {
             ImportRemoteMedia::dispatch($id, $media);
         }
