@@ -78,9 +78,12 @@ final class ImportRemoteMedia implements ShouldBeEncrypted, ShouldQueue
             return;
         }
 
+        // Readers need the size to keep the page from jumping; what is not an image has none.
+        $size = @getimagesizefromstring($response->body) ?: [null, null];
+
         $entry->addMediaFromString($response->body)
             ->usingFileName($this->fileName($response->header('content-type')))
-            ->withCustomProperties(['source_url' => $url, 'alt' => $this->media->alt])
+            ->withCustomProperties(['source_url' => $url, 'alt' => $this->media->alt, 'width' => $size[0], 'height' => $size[1]])
             ->toMediaCollection($this->media->field);
     }
 

@@ -8,7 +8,8 @@
                 "versions": {
                     "gllhub/portfolio": "0.1.x-dev",
                     "gllhub/medium": "0.1.x-dev",
-                    "gllhub/github": "0.1.x-dev"
+                    "gllhub/github": "0.1.x-dev",
+                    "gllhub/json-resume": "0.1.x-dev"
                 }
             }
         }
@@ -16,6 +17,7 @@
     "require": {
         "gllhub/portfolio": "*@dev",
         "gllhub/medium": "*@dev",
-        "gllhub/github": "*@dev"
+        "gllhub/github": "*@dev",
+        "gllhub/json-resume": "*@dev"
     }
 }

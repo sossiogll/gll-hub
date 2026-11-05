@@ -22,6 +22,8 @@
         <env name="APP_KEY" value="base64:AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8="/>
         <env name="APP_URL" value="https://hub.example.test/"/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
+        <env name="GLLHUB_DEFAULT_LANGUAGE" value="en"/>
+        <env name="GLLHUB_LANGUAGES" value="en,it"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="BROADCAST_CONNECTION" value="null"/>
         <env name="CACHE_STORE" value="array"/>

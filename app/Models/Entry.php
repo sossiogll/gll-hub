@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Packages\PackageRegistry;
 use Gll\Hub\Contracts\Content\FieldType;
 use Gll\Hub\Contracts\Source\BodyFormat;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -54,6 +55,17 @@ class Entry extends Model implements HasMedia
             'source_updated_at' => 'datetime',
             'synced_at' => 'datetime',
         ];
+    }
+
+    /**
+     * What readers may see. An entry dated in the future is not out yet.
+     *
+     * @param Builder<Entry> $query
+     * @return Builder<Entry>
+     */
+    public function scopePublished(Builder $query): Builder
+    {
+        return $query->whereNotNull('published_at')->where('published_at', '<=', now());
     }
 
     /**
