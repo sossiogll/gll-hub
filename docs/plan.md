@@ -126,6 +126,19 @@ inventory of what b5srl.eu really uses, because "identical API v1" would bring a
 keeps free of it, and where it goes has to be decided first (D10). Until then, `master` stays frozen, and nothing merges into
 it.
 
+### A6. The full CV (approved 2026-11-05, in progress)
+
+The site asked for nested fields on the `resume` type. Answer given the same day: lists inside lists work at any depth,
+and `required`, enums and undeclared keys are checked at every depth during a sync. There is no type for a group of fixed
+keys, so the levels of a language are four flat fields of the item.
+
+- `resume`: `work[].employment_type`, `work[].skills[]`, `education[].skills[]`, `languages[]` with `reading`, `writing`,
+  `listening` and `speaking`, `interests[]`. `skills` and `interests` share one shape, `{ name, keywords }`.
+- `gllhub/json-resume` reads them, the keys outside the JSON Resume schema included (`employmentType`, `skills`, `levels`).
+- Pull request: gllhub-packages#7. Checked through the real upserter and API on the local stack.
+- Still to do, with the user: add the new keys to `sossiogll/curriculum.json`. Their values are the user's to give; the
+  file only gains `languages` today. The site updates its contract.
+
 ### Definition of closed
 
 gllHub is closed when A1 to A4 are done, the site runs on the public API, and D10 has an answer, even if the answer is "later".
@@ -256,6 +269,7 @@ All on 2026-11-05 unless dated. Each covers what it says and no more.
 - gllhub-packages#6, gll-hub#7 and this plan (gll-hub#6) merged once their CI was green. This settles D1. The numbers of the
   other decisions stay as they are.
 - No more refinements until this plan is approved.
+- The full CV approved as phase A6, with the levels of a language as four flat fields, as recommended.
 
 ## Not doing
 
