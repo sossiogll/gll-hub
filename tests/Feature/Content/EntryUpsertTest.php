@@ -315,6 +315,16 @@ final class EntryUpsertTest extends HubTestCase
         $this->assertSame(['book', 'not-yet'], [$references[1]->type, $references[1]->slug]);
     }
 
+    public function test_a_markdown_body_keeps_its_comments(): void
+    {
+        $body = "Text.\n\n<!-- gll:demo -->\n\n<!-- gll:widget nome -->\n";
+        $this->script->entries['catalog'] = [Entries::book('1', 'Dune', ['body' => $body])];
+
+        $this->sync($this->makeInstance());
+
+        $this->assertSame($body, Entry::sole()->body);
+    }
+
     public function test_a_reference_by_a_name_as_people_write_it_finds_the_entry_with_that_title(): void
     {
         $this->script->entries['catalog'] = [

@@ -44,8 +44,8 @@ CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
 # The frontend does not depend on the CPU: build it once, natively, for every platform.
 FROM --platform=$BUILDPLATFORM node:22 AS assets
 WORKDIR /app
-COPY package.json ./
-RUN npm install --no-audit --no-fund
+COPY package.json package-lock.json ./
+RUN npm ci --no-audit --no-fund
 COPY vite.config.js ./
 COPY resources resources
 RUN npm run build

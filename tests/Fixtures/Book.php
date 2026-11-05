@@ -33,7 +33,7 @@ final class Book implements ContentType
                 new Field('sequel', 'Sequel', FieldType::Reference, curated: true, references: ['book']),
                 new Field('featured', 'Featured', FieldType::Boolean, curated: true),
                 new Field('position', 'Position', FieldType::Integer, curated: true),
-                new Field('blurb', 'Blurb', FieldType::String, curated: true, maxLength: 20),
+                new Field('blurb', 'Blurb', FieldType::String, translatable: true, curated: true, maxLength: 20),
             ],
         );
     }
