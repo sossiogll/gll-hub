@@ -6,15 +6,23 @@ and every integration comes from a package, and the core knows none of them by n
 for writing code are in [`CLAUDE.md`](CLAUDE.md). The packages live in
 [`sossiogll/gllhub-packages`](https://github.com/sossiogll/gllhub-packages).
 
+## The API
+
+The read API is public, with a rate limit (`GLLHUB_API_PER_MINUTE`), and served under `/api/v2`: `/languages`,
+`/entries/{type}` and `/entries/{type}/{slug}`, for whatever types the installed packages declare. Its contract is
+`docs/api-v2.openapi.yaml` in the repository of the site, and a consumer's base URL ends in `/api/v2`. It needs
+`GLLHUB_LANGUAGES` and `GLLHUB_DEFAULT_LANGUAGE`; without them it answers 503. See
+[ADR 0003](docs/adr/0003-the-read-api-serves-any-declared-type.md).
+
 ## Development
 
 The development stack builds from this checkout and mounts the sources. Clone this repository and `gllhub-packages`
 side by side (the stack mounts the sibling folder):
 
 ```sh
-git clone https://github.com/sossiogll/laravel-blog.git
+git clone https://github.com/sossiogll/gll-hub.git
 git clone https://github.com/sossiogll/gllhub-packages.git
-cd laravel-blog
+cd gll-hub
 git checkout next
 docker compose -f docker-compose.dev.yml up
 ```

@@ -28,5 +28,8 @@ class AppServiceProvider extends ServiceProvider
         // Per caller and per endpoint, so a noisy sender cannot starve the others.
         RateLimiter::for('webhooks', fn (Request $request): Limit => Limit::perMinute((int) config('gllhub.webhooks.per_minute'))
             ->by($request->ip().'|'.$request->route('package').'/'.$request->route('key')));
+
+        RateLimiter::for('api-v2', fn (Request $request): Limit => Limit::perMinute((int) config('gllhub.api.per_minute'))
+            ->by((string) $request->ip()));
     }
 }

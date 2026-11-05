@@ -33,4 +33,14 @@ return [
         'per_minute' => (int) env('GLLHUB_WEBHOOKS_PER_MINUTE', 120),
     ],
 
+    'api' => [
+        'per_minute' => (int) env('GLLHUB_API_PER_MINUTE', 300),
+    ],
+
+    // Declared, never guessed from the content: the API cannot answer without them.
+    'languages' => [
+        'default' => env('GLLHUB_DEFAULT_LANGUAGE'),
+        'available' => array_values(array_filter(array_map('trim', explode(',', (string) env('GLLHUB_LANGUAGES', ''))))),
+    ],
+
 ];

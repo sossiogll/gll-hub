@@ -25,9 +25,13 @@ final class Book implements ContentType
                 new Field('stage', 'Stage', FieldType::Enum, options: ['draft', 'published']),
                 new Field('cover', 'Cover', FieldType::Media),
                 new Field('gallery', 'Gallery', FieldType::Media, multiple: true),
+                new Field('notes', 'Notes', FieldType::Markdown),
+                new Field('released', 'Released', FieldType::Date),
                 new Field('chapters', 'Chapters', FieldType::List, of: [
                     new Field('title', 'Title', FieldType::String, required: true),
                     new Field('summary', 'Summary', FieldType::Text),
+                    new Field('draft', 'Draft', FieldType::Markdown),
+                    new Field('finished_at', 'Finished at', FieldType::Date),
                 ]),
                 new Field('related', 'Related', FieldType::Reference, multiple: true, references: ['book']),
                 new Field('sequel', 'Sequel', FieldType::Reference, curated: true, references: ['book']),
