@@ -87,7 +87,7 @@ The compose file and the image exist, and CI builds the image. What is missing:
 - **Decide** host, public address of the API and of the admin (D7). The contract says `https://api.sossiogll.com`, the
   site's `GLLHUB_API_URL` must end in `/api/v2`, and the site's plan mentions a home server.
 - **The image to run.** `images.yml` publishes `:latest` from `master`, which is still the old application, and the compose
-  file defaults to `latest`. Until A5 is settled, production must pin a version: `:next` or a tag.
+  file defaults to `latest`. Until A5 is settled, production must pin a version: `:dev` or a tag.
 - **An instance image with the packages**, as in the README: `composer.local.json` with `github`, `medium`, `portfolio` and
   `json-resume`, which today are not published anywhere it can install them from (D8).
 - **Configuration:** `APP_URL`, `TRUSTED_PROXIES` (the rate limit counts by address, so a wrong one puts every visitor in
@@ -133,7 +133,7 @@ The same steps as Musizeer. What differs is that gllHub's repository is not read
 
 | | Musizeer | `sossiogll/gll-hub` today |
 | --- | --- | --- |
-| Default branch | `master`, the current code | `master`, the old application; the code is on `next` |
+| Default branch | `master`, the current code | `master`, the old application; the code is on `dev` |
 | Releases | automatic, from labels | none, and no automation; old tags `1.1.0`, `2.0`, `2.1`, `v1.0.0` |
 | Description | current | "Laravel 8.0 blog application…" |
 | Issues, discussions | on | both off |
@@ -147,8 +147,8 @@ site would show the description and README of a Laravel 8 blog.
 
 | Option | For | Against |
 | --- | --- | --- |
-| **`next` as default branch, and releases from `next` (recommended)** | No commit on `master`. The GitHub page and the site tell the same story. Reversible | Must first check that b5srl.eu's deployment names `master` rather than following the default |
-| Releases from `next`, default stays `master` | Touches nothing about b5srl.eu | Whoever opens the repository sees the old README |
+| **`dev` as default branch, and releases from `dev` (recommended)** | No commit on `master`. The GitHub page and the site tell the same story. Reversible | Must first check that b5srl.eu's deployment names `master` rather than following the default |
+| Releases from `dev`, default stays `master` | Touches nothing about b5srl.eu | Whoever opens the repository sees the old README |
 | A new repository for the core | Clean, not a fork | Loses history, pull requests and links; the name was just settled |
 
 The repository also shows as a fork, which the source accepts. Detaching it is cosmetic, and only GitHub support can do it (D12).
@@ -198,9 +198,9 @@ small change in `gllhub/github`.
 ### B5. Order
 
 1. B1, after checking b5srl.eu's deployment.
-2. B2 in a pull request into `next`.
+2. B2 in a pull request into `dev`.
 3. B3, issues first.
-4. B4 in a pull request into `next`.
+4. B4 in a pull request into `dev`.
 5. A release that contains the file. Check that `v3.0.0` has `.github/showcase.md`.
 6. **Only now the topic `showcase`**, on `sossiogll/gll-hub`.
 7. A sync in the local stack, or in production if A3 is done. Validate the answers against the contract, and look at the
@@ -225,7 +225,7 @@ B does not depend on A, except for step 7 in production. It can run first, local
 | D8 | How the instance image gets the packages | A private registry or a path copy in the image: to compare in A3 |
 | D9 | Sync interval | One hour, about 840 calls a day |
 | D10 | When and where the b5srl.eu port goes | Inventory after the site is live |
-| D11 | What of `gll-hub` gets read | `next` as default, after checking b5srl.eu |
+| D11 | What of `gll-hub` gets read | `dev` as default, after checking b5srl.eu |
 | D12 | Detach the fork | No, it is cosmetic |
 | D13 | First version | `v3.0.0` |
 | D14 | Milestones for past pull requests | No |
@@ -245,6 +245,8 @@ All on 2026-11-05 unless dated. Each covers what it says and no more.
   PHP 8.4, `package-lock.json` committed, CV from a JSON file in a repository, `docs/` over the wiki, milestones with their
   items, discussions imported instead of giscus, no comments or likes in API v2.
 - `gll-hub` is the repository's identifier, and gllHub the name of the project.
+- The integration branch of `gll-hub` renamed from `next` to `dev`, like the site's and Musizeer's. Merge commits above
+  and old pull requests keep the old name.
 - `sossiogll/curriculum.json` created as public, with the dates still as in the Word document. Whether they are right is
   still open: the start and the end of the Master's degree, Micron, the two roles at Atida.
 - The demo source and its entries deleted from the local database.
