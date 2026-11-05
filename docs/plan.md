@@ -21,16 +21,19 @@ approved:** nothing below starts without their go-ahead.
 | Shared curation (ADR 0002), stale files, PHP 8.4, widgets, translation rules | gll-hub#3, gllhub-packages#3 | `485d6da`, `59caa70` | 2026-11-05 |
 | Milestone items, docs, discussions, boards | gll-hub#4, gllhub-packages#4 | `ffce1d0`, `83e838c` | 2026-11-05 |
 | API v2 (ADR 0003); CV type and `gllhub/json-resume` | gll-hub#5, gllhub-packages#5 | `43f0151`, `3fe693c` | 2026-11-05 |
+| Already encoded relative links fixed; CI for the packages | gllhub-packages#6 | `d0a5886` | 2026-11-05 |
+| Integration branch renamed from `next` to `dev`, image `:dev` | gll-hub#7 | `211c11a` | 2026-11-05 |
+| This plan | gll-hub#6 | `ba8438c` | 2026-11-05 |
 
 ### Open
 
-- **gllhub-packages#6**, head `cbc47e8`: fixes relative links that were already encoded, and adds CI for that repository.
-  Waiting for the user's merge decision (D1). The action that validated `showcase.md` was written there and removed on the
-  user's decision: see "Not doing".
+No pull request is open on `gll-hub` or `gllhub-packages`, except the one that carries this update.
 
 ### Verified on 2026-11-05
 
-- Suites: core 241 tests, contract 16, packages 135 on the branch of gllhub-packages#6.
+- Suites: core 241 tests, contract 16, packages 135.
+- CI: on `dev`, `CI` and `images` passed on `211c11a`, and the image `:dev` is in the registry. Nobody has run it. CI for
+  the packages runs on pull requests and on `master`.
 - A real sync of `sossiogll/musizeer` at `v2.0.4` in the local stack on MariaDB: the showcase file, the three images copied
   and served, milestones with items, one board.
 - Those answers validated against the site's `docs/api-v2.openapi.yaml` before the release and after it, and by the site's
@@ -215,7 +218,6 @@ B does not depend on A, except for step 7 in production. It can run first, local
 
 | # | Decision | Recommendation |
 | --- | --- | --- |
-| D1 | Merge gllhub-packages#6 | Yes, once CI is green on the last commit |
 | D2 | A1: how a refused file's reason reaches the admin | ADR first, an optional capability in the contract |
 | D3 | Rate limit for the site | Decide with real traffic, in A3 |
 | D4 | Canonical of a project | Send none |
@@ -251,6 +253,8 @@ All on 2026-11-05 unless dated. Each covers what it says and no more.
   still open: the start and the end of the Master's degree, Micron, the two roles at Atida.
 - The demo source and its entries deleted from the local database.
 - The action that validated `showcase.md` dropped: validation belongs to the application, not to a pipeline.
+- gllhub-packages#6, gll-hub#7 and this plan (gll-hub#6) merged once their CI was green. This settles D1. The numbers of the
+  other decisions stay as they are.
 - No more refinements until this plan is approved.
 
 ## Not doing
