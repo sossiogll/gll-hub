@@ -71,8 +71,11 @@ final class SyncSourceInstance implements ShouldBeUniqueUntilProcessing, ShouldQ
 
         $health->started($instance);
 
+        // A partial instance holds refusals that only a run over everything can confirm or clear.
+        $externalIds = $instance->status === SyncStatus::Partial ? null : $this->externalIds;
+
         try {
-            $report = $synchronizer->run($instance, $this->externalIds);
+            $report = $synchronizer->run($instance, $externalIds);
         } catch (Throwable $e) {
             $failure = Failure::of($e, $this->attempts());
             $health->failed($instance, $failure);

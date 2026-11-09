@@ -19,9 +19,10 @@ use Tests\HubTestCase;
 
 final class RefusalTest extends HubTestCase
 {
-    private function runJob(SourceInstance $instance): void
+    /** @param list<string>|null $externalIds */
+    private function runJob(SourceInstance $instance, ?array $externalIds = null): void
     {
-        (new SyncSourceInstance($instance->id))->withFakeQueueInteractions()
+        (new SyncSourceInstance($instance->id, $externalIds))->withFakeQueueInteractions()
             ->handle($this->app->make(SourceSynchronizer::class), $this->app->make(InstanceHealth::class), $this->app->make(LoggerInterface::class));
     }
 
@@ -79,6 +80,30 @@ final class RefusalTest extends HubTestCase
 
         $this->assertSame(SyncStatus::Ok, $instance->fresh()->status);
         $this->assertNull($instance->fresh()->last_error);
+    }
+
+    public function test_a_sync_of_some_entries_of_a_partial_instance_runs_over_everything(): void
+    {
+        $instance = $this->makeInstance(attributes: ['status' => SyncStatus::Partial, 'last_error' => 'refused_by_source: 2 (en): bad yaml']);
+        $this->script->entries['catalog'] = [Entries::book('1'), Entries::refused('2', 'bad yaml')];
+        $this->script->fetchable = ['1' => Entries::book('1')];
+
+        $this->runJob($instance, ['1']);
+
+        $this->assertNotContains(['fetch', '1'], $this->script->calls);
+        $this->assertSame(SyncStatus::Partial, $instance->fresh()->status);
+        $this->assertSame('refused_by_source: 2 (en): bad yaml', $instance->fresh()->last_error);
+    }
+
+    public function test_a_sync_of_some_entries_of_an_ok_instance_fetches_only_those(): void
+    {
+        $instance = $this->makeInstance(attributes: ['status' => SyncStatus::Ok]);
+        $this->script->fetchable = ['1' => Entries::book('1')];
+
+        $this->runJob($instance, ['1']);
+
+        $this->assertContains(['fetch', '1'], $this->script->calls);
+        $this->assertSame(SyncStatus::Ok, $instance->fresh()->status);
     }
 
     public function test_the_summary_names_the_first_refusals_and_counts_the_rest(): void
