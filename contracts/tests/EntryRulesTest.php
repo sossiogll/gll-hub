@@ -66,6 +66,32 @@ final class EntryRulesTest extends TestCase
         $this->assertStringContainsString('no definition given for type "article"', implode(' ', EntryRules::violations(FeedSource::definition(), [], $this->entry())));
     }
 
+    public function test_a_refused_entry_is_judged_on_its_identity_and_its_reason_only(): void
+    {
+        $this->assertSame([], $this->violations(FeedSource::refused('x')));
+        $this->assertSame([], $this->violations(new ExternalEntry('x', 'article', '', fields: ['unknown' => 1], refusal: 'unreadable')));
+    }
+
+    public function test_a_refusal_needs_a_reason(): void
+    {
+        foreach (['', '  '] as $blank) {
+            $this->assertSame(['entry x: the refusal has no reason'], $this->violations(new ExternalEntry('x', 'article', '', refusal: $blank)));
+        }
+    }
+
+    public function test_a_refused_entry_keeps_its_identity_rules(): void
+    {
+        $all = implode("\n", [
+            ...$this->violations(new ExternalEntry('x', 'video', '', refusal: 'unreadable')),
+            ...$this->violations(new ExternalEntry('', 'article', '', refusal: 'unreadable')),
+            ...$this->violations(new ExternalEntry('x', 'article', '', language: 'English', refusal: 'unreadable')),
+        ]);
+
+        $this->assertStringContainsString('not in the source\'s produces', $all);
+        $this->assertStringContainsString('empty externalId', $all);
+        $this->assertStringContainsString('language "English"', $all);
+    }
+
     public function test_title_and_language(): void
     {
         $this->assertStringContainsString('empty title', implode(' ', $this->violations($this->entry(title: ''))));

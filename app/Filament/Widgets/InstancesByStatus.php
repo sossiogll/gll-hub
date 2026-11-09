@@ -24,7 +24,7 @@ class InstancesByStatus extends StatsOverviewWidget
                 ->color(match ($status) {
                     SyncStatus::Ok => 'success',
                     SyncStatus::Pending => 'gray',
-                    SyncStatus::Retrying => 'warning',
+                    SyncStatus::Retrying, SyncStatus::Partial => 'warning',
                     SyncStatus::Failing, SyncStatus::Failed => 'danger',
                 }),
             SyncStatus::cases(),

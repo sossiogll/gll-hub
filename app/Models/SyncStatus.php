@@ -10,6 +10,8 @@ enum SyncStatus: string
     /** Never ran. */
     case Pending = 'pending';
     case Ok = 'ok';
+    /** Ran to the end, but refused some entries; the admin shows why. */
+    case Partial = 'partial';
     /** The service was unavailable or asked to slow down; a new attempt is scheduled. */
     case Retrying = 'retrying';
     /** Needs the admin: a credential or a setting is wrong. Nothing retries until it is fixed. */

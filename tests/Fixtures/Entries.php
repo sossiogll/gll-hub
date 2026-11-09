@@ -25,4 +25,9 @@ final class Entries
 
         return new ExternalEntry(...$arguments);
     }
+
+    public static function refused(string $id, string $reason, string $language = 'en'): ExternalEntry
+    {
+        return new ExternalEntry(externalId: $id, type: 'book', title: '', language: $language, refusal: $reason);
+    }
 }

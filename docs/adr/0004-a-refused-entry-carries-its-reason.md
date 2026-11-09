@@ -122,3 +122,19 @@ They answer the questions this proposal left open, and were given before the use
   list cut in silence. With a `guid` the item has an identity and becomes a refused entry; without one only a log
   line can name it.
 - **`gllhub/portfolio`** declares content types and reads nothing, so it has nothing to refuse and does not change.
+
+## Amendment, 2026-11-09: a webhook cannot clear a partial instance
+
+Found while checking phase 1, and decided by the user the same day. A webhook syncs only the entries it names. On a
+partial instance, such a run sees none of the refused entries, ends clean and sets the status back to `ok`: the
+refusals are hidden until the next scheduled run, which is what this ADR forbids.
+
+- **Decision:** while an instance is `partial`, every sync of it runs over everything, the ones a webhook asks for
+  included. The status always comes from a run that saw every entry. An `ok` instance keeps syncing only the entries
+  a webhook names. The core decides it in `SyncSourceInstance`, without knowing any package.
+- **Rejected:** keeping `partial` until a scheduled run, because a file fixed by a push would stay flagged until then;
+  merging the summaries of several runs, because it would parse `last_error` or need the table option 2 rejected.
+- **Cost:** a full run on each webhook, only while something is refused.
+- **Limit:** a source that syncs incrementally does not read old items again on a full run, so a refusal it reported
+  once is not seen again, and its next clean run sets `ok`. No package syncs incrementally today; one that does will
+  need its own answer.
