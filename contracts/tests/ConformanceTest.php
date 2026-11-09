@@ -54,6 +54,12 @@ final class ConformanceTest extends TestCase
         }
     }
 
+    public function test_a_refused_entry_conforms_without_a_title(): void
+    {
+        Conformance::checkEntries(FeedSource::definition(), [Article::definition()], [FeedSource::refused('x')]);
+        $this->addToAssertionCount(1);
+    }
+
     public function test_bad_entries_are_reported(): void
     {
         $bad = new ExternalEntry(
@@ -78,7 +84,8 @@ final class ConformanceTest extends TestCase
     {
         $this->assertTrue(Contracts::accepts('1.0'));
         $this->assertTrue(Contracts::accepts('1.0.3'));
-        $this->assertFalse(Contracts::accepts('1.1'));
+        $this->assertTrue(Contracts::accepts('1.1'));
+        $this->assertFalse(Contracts::accepts('1.2'));
         $this->assertFalse(Contracts::accepts('2.0'));
         $this->assertFalse(Contracts::accepts('one'));
     }

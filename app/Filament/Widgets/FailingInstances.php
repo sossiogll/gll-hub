@@ -21,10 +21,10 @@ class FailingInstances extends TableWidget
     {
         return $table
             ->heading('Needing attention')
-            ->query(SourceInstance::query()->whereIn('status', [SyncStatus::Retrying->value, SyncStatus::Failing->value, SyncStatus::Failed->value])->orderBy('label'))
+            ->query(SourceInstance::query()->whereIn('status', [SyncStatus::Partial->value, SyncStatus::Retrying->value, SyncStatus::Failing->value, SyncStatus::Failed->value])->orderBy('label'))
             ->columns([
                 TextColumn::make('label')->url(static fn (SourceInstance $record): string => SourceInstanceResource::getUrl('edit', ['record' => $record])),
-                TextColumn::make('status')->badge()->formatStateUsing(static fn (SyncStatus $state): string => ucfirst($state->value))->color('danger'),
+                TextColumn::make('status')->badge()->formatStateUsing(static fn (SyncStatus $state): string => ucfirst($state->value))->color(static fn (SyncStatus $state): string => $state === SyncStatus::Partial ? 'warning' : 'danger'),
                 TextColumn::make('last_error')->limit(80)->wrap(),
                 TextColumn::make('last_run_at')->label('Last run')->dateTime(),
             ])

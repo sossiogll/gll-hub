@@ -92,6 +92,11 @@ final class FeedSource implements Source, FetchesSingleEntry
         return self::sample($externalId);
     }
 
+    public static function refused(string $id): ExternalEntry
+    {
+        return new ExternalEntry(externalId: $id, type: 'article', title: '', refusal: 'the front matter is not valid YAML');
+    }
+
     public static function sample(string $id): ExternalEntry
     {
         return new ExternalEntry(

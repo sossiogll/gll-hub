@@ -87,7 +87,11 @@ final class SyncSourceInstance implements ShouldBeUniqueUntilProcessing, ShouldQ
             return;
         }
 
-        $health->succeeded($instance);
+        if ($report->refused()) {
+            $health->partial($instance, $report->refusalSummary());
+        } else {
+            $health->succeeded($instance);
+        }
         $logger->info('Sync finished', ['instance' => $instance->id, 'package' => $instance->package, 'report' => $report->summary()]);
     }
 
