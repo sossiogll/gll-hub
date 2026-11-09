@@ -128,6 +128,50 @@ final class LaravelHttpClientTest extends TestCase
         $this->assertSame([90, 60, 60, 60, 1], $waits);
     }
 
+    public function test_a_403_with_retry_after_is_rate_limited_not_refused_credentials(): void
+    {
+        Http::fake(['*' => Http::response('', 403, ['Retry-After' => '45'])]);
+
+        try {
+            $this->client()->get('https://api.test/x');
+            $this->fail('expected RateLimited');
+        } catch (RateLimited $e) {
+            $this->assertSame(45, $e->retryAfter);
+        }
+    }
+
+    public function test_a_403_with_an_empty_quota_waits_until_it_resets(): void
+    {
+        $this->travelTo('2026-05-05 10:00:00');
+        Http::fake(['*' => Http::response('', 403, [
+            'X-RateLimit-Remaining' => '0',
+            'X-RateLimit-Reset' => (string) now()->addMinutes(10)->getTimestamp(),
+        ])]);
+
+        try {
+            $this->client()->get('https://api.test/x');
+            $this->fail('expected RateLimited');
+        } catch (RateLimited $e) {
+            $this->assertSame(600, $e->retryAfter);
+        }
+    }
+
+    public function test_a_403_with_quota_left_or_no_signal_stays_refused_credentials(): void
+    {
+        Http::fake(['*' => Http::sequence()
+            ->push('', 403, ['X-RateLimit-Remaining' => '12', 'X-RateLimit-Reset' => '9999999999'])
+            ->push('', 403, ['X-RateLimit-Remaining' => '0'])]);
+
+        foreach ([1, 2] as $ignored) {
+            try {
+                $this->client()->get('https://api.test/x');
+                $this->fail('expected InvalidCredentials');
+            } catch (InvalidCredentials $e) {
+                $this->assertStringContainsString('403', $e->getMessage());
+            }
+        }
+    }
+
     public function test_the_user_agent_and_the_request_are_sent_as_configured(): void
     {
         config(['gllhub.http.user_agent' => 'gllHub-test/1.0']);

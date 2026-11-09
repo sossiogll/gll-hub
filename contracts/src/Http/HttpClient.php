@@ -10,8 +10,9 @@ namespace Gll\Hub\Contracts\Http;
  * classification of failures, in ONE place:
  *
  * - network error, timeout, 5xx → throws Exceptions\Unavailable
- * - 429                          → throws Exceptions\RateLimited (Retry-After honoured)
- * - 401, 403                     → throws Exceptions\InvalidCredentials
+ * - 429, or 403 that carries Retry-After (or X-RateLimit-Remaining: 0 with X-RateLimit-Reset)
+ *                                → throws Exceptions\RateLimited (the wait is honoured)
+ * - 401, any other 403           → throws Exceptions\InvalidCredentials
  * - anything else (2xx, 3xx after redirects, 404, other 4xx) → returned; the package decides
  */
 interface HttpClient
