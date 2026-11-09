@@ -18,6 +18,8 @@ enum FieldType: string
     case Enum = 'enum';
     /** A list of small objects, each shaped by Field::$of (features, decisions…). */
     case List = 'list';
+    /** One object made of named fields, each shaped by Field::$of (a graph of two lists, an address…). */
+    case Group = 'group';
     /** A link to other entries, by content type key (a sequel, related books…). */
     case Reference = 'reference';
     /** One or more images or files from the media library. */

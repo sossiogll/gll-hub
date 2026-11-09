@@ -30,7 +30,7 @@ final class FieldRules
             return [];
         }
 
-        if ($field->multiple && $field->type !== FieldType::List) {
+        if ($field->multiple && $field->type !== FieldType::List && $field->type !== FieldType::Group) {
             if (! is_array($value) || ! array_is_list($value)) {
                 return ["field \"{$field->key}\" must be a list of values"];
             }
@@ -109,6 +109,9 @@ final class FieldRules
 
             case FieldType::List:
                 return self::items($field, $value, $at);
+
+            case FieldType::Group:
+                return self::group($field, $value, $at);
         }
     }
 
@@ -121,23 +124,48 @@ final class FieldRules
 
         $v = [];
         foreach ($value as $i => $item) {
-            if (! is_array($item) || array_is_list($item) && $item !== []) {
-                $v[] = "field \"{$at}[{$i}]\" must be an item with named values";
+            array_push($v, ...self::object($field, $item, "{$at}[{$i}]", "item {$i} of \"{$at}\": ", 'item fields', "an item with named values"));
+        }
+
+        return $v;
+    }
+
+    /** @return list<string> */
+    private static function group(Field $field, mixed $value, string $at): array
+    {
+        // An empty object is no value, so it owes nothing to the required fields inside; missing() judges a required group.
+        if ($value === []) {
+            return [];
+        }
+
+        return self::object($field, $value, $at, "field \"{$at}\": ", 'fields', 'an object with named values');
+    }
+
+    /**
+     * The one check of an object whose keys are the fields in $holder->of: the item of a list and the value of a group.
+     *
+     * @param string $prefix goes before each problem found inside, to say where it is
+     * @return list<string>
+     */
+    private static function object(Field $holder, mixed $object, string $at, string $prefix, string $fieldsName, string $expected): array
+    {
+        if (! is_array($object) || array_is_list($object) && $object !== []) {
+            return ["field \"{$at}\" must be {$expected}"];
+        }
+
+        $v = [];
+        foreach ($object as $key => $value) {
+            $inner = self::inner($holder, (string) $key);
+            if ($inner === null) {
+                $v[] = "field \"{$at}\" has \"{$key}\", which is not in its {$fieldsName}";
                 continue;
             }
-            foreach ($item as $key => $itemValue) {
-                $inner = self::inner($field, (string) $key);
-                if ($inner === null) {
-                    $v[] = "field \"{$at}[{$i}]\" has \"{$key}\", which is not in its item fields";
-                    continue;
-                }
-                foreach (self::violations($inner, $itemValue) as $problem) {
-                    $v[] = "item {$i} of \"{$at}\": {$problem}";
-                }
+            foreach (self::violations($inner, $value) as $problem) {
+                $v[] = $prefix . $problem;
             }
-            foreach (self::missing($field->of, $item) as $problem) {
-                $v[] = "item {$i} of \"{$at}\": {$problem}";
-            }
+        }
+        foreach (self::missing($holder->of, $object) as $problem) {
+            $v[] = $prefix . $problem;
         }
 
         return $v;

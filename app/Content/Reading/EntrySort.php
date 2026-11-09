@@ -17,7 +17,7 @@ final class EntrySort
 {
     /** The core's own columns that can sort, as the API names them. */
     private const COLUMNS = ['published_at' => 'published_at', 'title' => 'title', 'slug' => 'slug', 'updated_at' => 'COALESCE(source_updated_at, updated_at)'];
-    private const NOT_SORTABLE = [FieldType::List, FieldType::Markdown, FieldType::Media, FieldType::Reference];
+    private const NOT_SORTABLE = [FieldType::List, FieldType::Group, FieldType::Markdown, FieldType::Media, FieldType::Reference];
 
     public static function accepts(ContentTypeDefinition $type, string $key): bool
     {

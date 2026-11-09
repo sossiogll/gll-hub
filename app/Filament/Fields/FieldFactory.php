@@ -16,6 +16,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Utilities\Get;
 use Gll\Hub\Contracts\Content\Field;
 use Gll\Hub\Contracts\Content\FieldType;
@@ -128,9 +129,14 @@ final class FieldFactory
 
     private static function component(Field $field, string $name): Component
     {
+        if ($field->type === FieldType::Group) {
+            return Fieldset::make($field->label)
+                ->statePath($name)
+                ->schema(self::inner($field));
+        }
         if ($field->type === FieldType::List) {
             return Repeater::make($name)
-                ->schema(array_map(static fn (Field $inner): Component => self::decorate(self::component($inner, $inner->key), $inner, false), $field->of))
+                ->schema(self::inner($field))
                 ->defaultItems(0)
                 ->collapsible()
                 ->itemLabel(static fn (array $state): ?string => collect($state)->first(static fn (mixed $value): bool => is_string($value) && $value !== ''));
@@ -144,6 +150,12 @@ final class FieldFactory
         }
 
         return self::single($field, $name);
+    }
+
+    /** @return list<Component> the fields of a list's item or of a group, drawn as any other field */
+    private static function inner(Field $holder): array
+    {
+        return array_map(static fn (Field $inner): Component => self::decorate(self::component($inner, $inner->key), $inner, false), $holder->of);
     }
 
     private static function single(Field $field, string $name): Component
@@ -162,8 +174,8 @@ final class FieldFactory
             FieldType::Enum => Select::make($name)->options(array_combine($field->options, $field->options))->multiple($field->multiple),
             FieldType::Reference => self::reference($field, $name),
             FieldType::Media => SpatieMediaLibraryFileUpload::make($name)->collection($field->key)->multiple($field->multiple)->reorderable($field->multiple),
-            // A list is handled by component(); it only reaches here by mistake.
-            FieldType::List => TextInput::make($name),
+            // A list and a group are handled by component(); they only reach here by mistake.
+            FieldType::List, FieldType::Group => TextInput::make($name),
         };
     }
 
@@ -194,13 +206,17 @@ final class FieldFactory
 
     private static function decorate(Component $component, Field $field, bool $readOnly): Component
     {
-        $component->label($field->label)->helperText($field->help !== '' ? $field->help : null);
+        $component->label($field->label);
+        // A fieldset has no place for help text.
+        if ($field->type !== FieldType::Group) {
+            $component->helperText($field->help !== '' ? $field->help : null);
+        }
 
         // Required Media and Reference fields are not enforced by the rules, so they are not promised here either.
         $required = $field->required && ! in_array($field->type, [FieldType::Boolean, FieldType::Media, FieldType::Reference], true);
         $component->markAsRequired($required);
 
-        if (in_array($field->type, [FieldType::Text, FieldType::Markdown, FieldType::List, FieldType::Media], true) || ($field->multiple && $field->type !== FieldType::Enum)) {
+        if (in_array($field->type, [FieldType::Text, FieldType::Markdown, FieldType::List, FieldType::Group, FieldType::Media], true) || ($field->multiple && $field->type !== FieldType::Enum)) {
             $component->columnSpanFull();
         }
         if ($readOnly) {

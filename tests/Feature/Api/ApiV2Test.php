@@ -238,6 +238,7 @@ final class ApiV2Test extends HubTestCase
             'an undeclared field' => ['/api/v2/entries/book?language=en&fields=nope'],
             'sort by an undeclared field' => ['/api/v2/entries/book?language=en&sort=nope'],
             'sort by a list' => ['/api/v2/entries/book?language=en&sort=chapters'],
+            'sort by a group' => ['/api/v2/entries/book?language=en&sort=timeline'],
             'sort by Markdown' => ['/api/v2/entries/book?language=en&sort=notes'],
             'sort by media' => ['/api/v2/entries/book?language=en&sort=cover'],
             'sort by a reference' => ['/api/v2/entries/book?language=en&sort=related'],
@@ -313,6 +314,30 @@ final class ApiV2Test extends HubTestCase
         $this->assertSame('2026-02-01T10:00:00+00:00', $entry['updated_at']);
         $this->assertSame('2026-03-01T00:00:00+00:00', $entry['fields']['released']);
         $this->assertSame('2026-04-01T10:00:00+00:00', $entry['fields']['chapters'][0]['finished_at']);
+    }
+
+    public function test_a_group_is_served_with_its_shape_at_every_depth(): void
+    {
+        $this->entry('dune', [
+            'fields' => ['isbn' => '1', 'timeline' => [
+                'since' => '2026-03-01T02:00:00+02:00',
+                'place' => 'Arrakis',
+                'note' => 'Long note',
+                'rows' => [['message' => 'One', 'at' => '2026-04-01T10:00:00+02:00']],
+            ]],
+        ]);
+        $this->entry('emma', ['fields' => ['isbn' => '2']]);
+
+        $detail = $this->getJson('/api/v2/entries/book/dune?language=en')->assertOk()->json('fields.timeline');
+        $this->assertSame(
+            ['since' => '2026-03-01T00:00:00+00:00', 'rows' => [['message' => 'One', 'at' => '2026-04-01T08:00:00+00:00']], 'note' => 'Long note', 'place' => 'Arrakis'],
+            $detail,
+        );
+
+        $list = $this->getJson('/api/v2/entries/book?language=en&sort=slug')->assertOk()->json('data');
+        $this->assertArrayNotHasKey('note', $list[0]['fields']['timeline'], 'Markdown goes at any depth');
+        $this->assertSame('Arrakis', $list[0]['fields']['timeline']['place']);
+        $this->assertArrayNotHasKey('timeline', $list[1]['fields'], 'no value leaves the key out');
     }
 
     public function test_media_is_null_until_imported_then_a_file_with_its_size(): void

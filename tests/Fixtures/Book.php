@@ -33,6 +33,15 @@ final class Book implements ContentType
                     new Field('draft', 'Draft', FieldType::Markdown),
                     new Field('finished_at', 'Finished at', FieldType::Date),
                 ]),
+                new Field('timeline', 'Timeline', FieldType::Group, of: [
+                    new Field('since', 'Since', FieldType::Date),
+                    new Field('rows', 'Rows', FieldType::List, of: [
+                        new Field('message', 'Message', FieldType::String, required: true),
+                        new Field('at', 'At', FieldType::Date),
+                    ]),
+                    new Field('note', 'Note', FieldType::Markdown),
+                    new Field('place', 'Place', FieldType::String, required: true),
+                ]),
                 new Field('related', 'Related', FieldType::Reference, multiple: true, references: ['book']),
                 new Field('sequel', 'Sequel', FieldType::Reference, curated: true, references: ['book']),
                 new Field('featured', 'Featured', FieldType::Boolean, curated: true),

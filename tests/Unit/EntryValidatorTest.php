@@ -47,6 +47,14 @@ final class EntryValidatorTest extends TestCase
         ));
     }
 
+    public function test_a_group_is_checked_inside_a_hand_written_entry(): void
+    {
+        $violations = implode("\n", EntryValidator::handWritten(Book::definition(), 'Dune', ['isbn' => '1', 'timeline' => ['rows' => [], 'x' => 1]], []));
+
+        $this->assertStringContainsString('field "timeline" has "x", which is not in its fields', $violations);
+        $this->assertStringContainsString('field "timeline": required field "place" is missing', $violations);
+    }
+
     public function test_a_hand_written_entry_is_checked_against_every_field(): void
     {
         $violations = implode("\n", EntryValidator::handWritten(

@@ -27,6 +27,7 @@ final class FieldValue
             FieldType::Date => self::time($value),
             FieldType::Markdown => is_string($value) ? strtr($value, $copies) : $value,
             FieldType::List => is_array($value) ? array_map(static fn (mixed $item): array => self::item($field, (array) $item, $full, $copies), $value) : $value,
+            FieldType::Group => is_array($value) ? self::item($field, $value, $full, $copies) ?: null : $value,
             default => $value,
         };
     }
@@ -42,14 +43,16 @@ final class FieldValue
     }
 
     /**
+     * One object whose keys are the fields in $holder->of: an item of a list, or the value of a group.
+     *
      * @param array<string, mixed> $item
      * @param array<string, string> $copies
      * @return array<string, mixed>
      */
-    private static function item(Field $list, array $item, bool $full, array $copies): array
+    private static function item(Field $holder, array $item, bool $full, array $copies): array
     {
         $shaped = [];
-        foreach ($list->of as $inner) {
+        foreach ($holder->of as $inner) {
             $value = self::shape($inner, $item[$inner->key] ?? null, $full, $copies);
             if ($value !== null) {
                 $shaped[$inner->key] = $value;
