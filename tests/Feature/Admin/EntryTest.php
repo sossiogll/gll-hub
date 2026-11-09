@@ -33,6 +33,30 @@ final class EntryTest extends AdminTestCase
         $this->assertSame(['featured' => true], $entry->curated);
     }
 
+    public function test_a_group_is_filled_inside_its_fieldset_and_stored_as_one_object(): void
+    {
+        Livewire::withQueryParams(['type' => 'book'])->test(CreateEntry::class)
+            ->fillForm([
+                'title' => 'Dune',
+                'language' => 'en',
+                'fields' => ['isbn' => '978', 'timeline' => ['place' => 'Arrakis', 'since' => '', 'rows' => [['message' => 'One']]]],
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $this->assertSame(['rows' => [['message' => 'One']], 'place' => 'Arrakis'], Entry::sole()->fields['timeline']);
+    }
+
+    public function test_a_group_that_breaks_the_rules_is_refused_where_it_is(): void
+    {
+        Livewire::withQueryParams(['type' => 'book'])->test(CreateEntry::class)
+            ->fillForm(['title' => 'Dune', 'language' => 'en', 'fields' => ['isbn' => '978', 'timeline' => ['rows' => [['message' => 'One']]]]])
+            ->call('create')
+            ->assertHasErrors(['data.fields.timeline']);
+
+        $this->assertSame(0, Entry::count());
+    }
+
     public function test_the_cores_rules_refuse_what_does_not_fit_and_say_where(): void
     {
         Livewire::withQueryParams(['type' => 'book'])->test(CreateEntry::class)
@@ -74,6 +98,7 @@ final class EntryTest extends AdminTestCase
             ->assertSee('Synced')
             ->assertFormFieldIsDisabled('title')
             ->assertFormFieldIsDisabled('fields.isbn')
+            ->assertFormFieldIsDisabled('fields.timeline.place')
             ->assertFormFieldIsEnabled('curated.featured')
             ->fillForm(['title' => 'Hijacked', 'summary' => 'Hijacked', 'fields' => ['isbn' => 'hijacked'], 'curated' => ['featured' => true, 'blurb' => 'Read it']])
             ->call('save')

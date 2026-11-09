@@ -278,6 +278,28 @@ final class EntryUpsertTest extends HubTestCase
         $this->assertStringContainsString('2 refused', $report->summary());
     }
 
+    public function test_a_group_is_stored_and_a_bad_one_is_refused_with_its_reason(): void
+    {
+        $instance = $this->makeInstance();
+        $group = ['place' => 'Arrakis', 'rows' => [['message' => 'One']]];
+        $this->script->entries['catalog'] = [
+            Entries::book('good', 'Good', ['fields' => ['isbn' => '1', 'timeline' => $group]]),
+            Entries::book('unknown', 'Unknown key', ['fields' => ['isbn' => '2', 'timeline' => $group + ['x' => 1]]]),
+            Entries::book('missing', 'No place', ['fields' => ['isbn' => '3', 'timeline' => ['rows' => []]]]),
+            Entries::book('inner', 'Bad row', ['fields' => ['isbn' => '4', 'timeline' => ['place' => 'p', 'rows' => [['at' => '2026-01-01']]]]]),
+        ];
+
+        $report = $this->sync($instance);
+
+        $this->assertSame(['good'], Entry::pluck('external_id')->all());
+        $this->assertSame($group, Entry::sole()->fields['timeline']);
+        $this->assertSame(['unknown', 'missing', 'inner'], array_map(fn ($r) => $r->externalId, $report->refusals));
+        $this->assertSame([SyncReport::REFUSED_BY_RULES], array_unique(array_map(fn ($r) => $r->code, $report->refusals)));
+        $this->assertStringContainsString('field "timeline" has "x", which is not in its fields', $report->refusals[0]->reasons[0]);
+        $this->assertStringContainsString('field "timeline": required field "place" is missing', $report->refusals[1]->reasons[0]);
+        $this->assertStringContainsString('field "timeline": item 0 of "rows": required field "message" is missing', $report->refusals[2]->reasons[0]);
+    }
+
     public function test_an_entry_the_source_stopped_listing_comes_back_when_it_is_listed_again(): void
     {
         $instance = $this->makeInstance();

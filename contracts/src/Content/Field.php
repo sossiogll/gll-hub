@@ -19,7 +19,7 @@ final readonly class Field
 {
     /**
      * @param list<string> $options for Enum: the allowed values
-     * @param list<Field> $of for List: the fields of each item
+     * @param list<Field> $of for List: the fields of each item; for Group: the fields of its one value
      * @param list<string> $references for Reference: the content type keys it may point to
      */
     public function __construct(

@@ -60,6 +60,10 @@ final class Article implements ContentType
                 new Field('featured', 'Featured', FieldType::Boolean, curated: true),
                 new Field('related', 'Related', FieldType::Reference, references: ['article']),
                 new Field('sections', 'Sections', FieldType::List, of: [new Field('title', 'Title', FieldType::String)]),
+                new Field('timeline', 'Timeline', FieldType::Group, of: [
+                    new Field('start', 'Start', FieldType::Date),
+                    new Field('rows', 'Rows', FieldType::List, of: [new Field('message', 'Message', FieldType::String, required: true)]),
+                ]),
             ],
         );
     }

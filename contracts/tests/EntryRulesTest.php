@@ -142,6 +142,10 @@ final class EntryRulesTest extends TestCase
             new Field('day', 'Day', FieldType::Date),
             new Field('on', 'On', FieldType::Boolean),
             new Field('steps', 'Steps', FieldType::List, of: [new Field('what', 'What', FieldType::String, required: true)]),
+            new Field('timeline', 'Timeline', FieldType::Group, required: true, of: [
+                new Field('start', 'Start', FieldType::Date),
+                new Field('rows', 'Rows', FieldType::List, required: true, of: [new Field('message', 'Message', FieldType::String, required: true)]),
+            ]),
         ]);
         $problems = static fn (string $key, mixed $value): string => implode('|', FieldRules::violations($type->field($key), $value));
 
@@ -160,7 +164,43 @@ final class EntryRulesTest extends TestCase
         $this->assertStringContainsString('"why", which is not in its item fields', $problems('steps', [['what' => 'x', 'why' => 'y']]));
         $this->assertStringContainsString('must be a list of items', $problems('steps', 'x'));
 
-        $this->assertSame(['required field "name" is missing'], FieldRules::missing($type->fields, ['name' => '']));
-        $this->assertSame([], FieldRules::missing($type->fields, ['name' => 'a']));
+        $this->assertSame(['required field "name" is missing', 'required field "timeline" is missing'], FieldRules::missing($type->fields, ['name' => '']));
+        $this->assertSame([], FieldRules::missing($type->fields, ['name' => 'a', 'timeline' => ['rows' => [['message' => 'm']]]]));
+    }
+
+    public function test_a_group_is_one_object_checked_like_the_item_of_a_list(): void
+    {
+        $group = new Field('timeline', 'Timeline', FieldType::Group, of: [
+            new Field('start', 'Start', FieldType::Date),
+            new Field('rows', 'Rows', FieldType::List, required: true, of: [new Field('message', 'Message', FieldType::String, required: true)]),
+        ]);
+        $problems = static fn (mixed $value): array => FieldRules::violations($group, $value);
+
+        $this->assertSame([], $problems(['start' => '2026-01-01', 'rows' => [['message' => 'm']]]));
+        $this->assertSame([], $problems(null));
+        $this->assertSame([], $problems([]), 'an empty object is no value, so the required rows are not owed');
+        $this->assertSame(['field "timeline" has "x", which is not in its fields'], $problems(['rows' => [['message' => 'm']], 'x' => 1]));
+        $this->assertSame(['field "timeline": required field "rows" is missing'], $problems(['start' => '2026-01-01']));
+        $this->assertSame(['field "timeline": field "start" must be an ISO 8601 date'], $problems(['start' => 'soon', 'rows' => [['message' => 'm']]]));
+        $this->assertSame(['field "timeline": item 0 of "rows": required field "message" is missing'], $problems(['rows' => [[]]]));
+        $this->assertSame(['field "timeline" must be an object with named values'], $problems('x'));
+        $this->assertSame(['field "timeline" must be an object with named values'], $problems([['rows' => []]]));
+        $this->assertSame(['field "timeline" must be an object with named values'], $problems(['a']));
+
+        $multiple = new Field('timeline', 'Timeline', FieldType::Group, multiple: true, of: $group->of);
+        $this->assertSame([], FieldRules::violations($multiple, ['rows' => [['message' => 'm']]]), 'multiple is not read as a list of groups');
+    }
+
+    public function test_a_group_inside_a_group_is_checked_at_every_depth(): void
+    {
+        $outer = new Field('a', 'A', FieldType::Group, of: [
+            new Field('b', 'B', FieldType::Group, of: [new Field('c', 'C', FieldType::Integer, required: true)]),
+        ]);
+
+        $this->assertSame([], FieldRules::violations($outer, ['b' => ['c' => 1]]));
+        $this->assertSame(
+            ['field "a": field "b" has "d", which is not in its fields', 'field "a": field "b": required field "c" is missing'],
+            FieldRules::violations($outer, ['b' => ['d' => 1]]),
+        );
     }
 }

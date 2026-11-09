@@ -48,6 +48,8 @@ final class BrokenType implements ContentType
             new Field('title', 'Title', FieldType::String),
             new Field('stage', 'Stage', FieldType::Enum),
             new Field('features', 'Features', FieldType::List),
+            new Field('graph', 'Graph', FieldType::Group),
+            new Field('graphs', 'Graphs', FieldType::Group, multiple: true, of: [new Field('name', 'Name', FieldType::String)]),
         ]);
     }
 }

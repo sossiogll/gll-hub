@@ -43,6 +43,8 @@ final class ConformanceTest extends TestCase
                 '"title" is a core field',
                 'enum field "stage" has no options',
                 'list field "features" has no item fields',
+                'group field "graph" has no fields',
+                'group field "graphs" is marked multiple, and a list of groups is a List',
                 'source repo produces no content type',
                 'declares incremental but does not implement',
                 'enum setting "mode" has no options',
@@ -85,7 +87,8 @@ final class ConformanceTest extends TestCase
         $this->assertTrue(Contracts::accepts('1.0'));
         $this->assertTrue(Contracts::accepts('1.0.3'));
         $this->assertTrue(Contracts::accepts('1.1'));
-        $this->assertFalse(Contracts::accepts('1.2'));
+        $this->assertTrue(Contracts::accepts('1.2'));
+        $this->assertFalse(Contracts::accepts('1.3'));
         $this->assertFalse(Contracts::accepts('2.0'));
         $this->assertFalse(Contracts::accepts('one'));
     }

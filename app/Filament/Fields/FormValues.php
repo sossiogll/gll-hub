@@ -69,6 +69,11 @@ final class FormValues
         if ($field->type === FieldType::List) {
             return self::items($field, $value);
         }
+        if ($field->type === FieldType::Group) {
+            $values = is_array($value) ? self::fields($field->of, $value) : [];
+
+            return $values === [] ? null : $values;
+        }
         if ($field->multiple) {
             if (! is_array($value)) {
                 return self::one($field, $value);

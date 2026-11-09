@@ -221,6 +221,15 @@ final class Conformance
                 }
                 self::checkFields($f->of, "{$where}.{$f->key}", $v, topLevel: false);
             }
+            if ($f->type === FieldType::Group) {
+                if ($f->of === []) {
+                    $v[] = "{$where}: group field \"{$f->key}\" has no fields";
+                }
+                if ($f->multiple) {
+                    $v[] = "{$where}: group field \"{$f->key}\" is marked multiple, and a list of groups is a List";
+                }
+                self::checkFields($f->of, "{$where}.{$f->key}", $v, topLevel: false);
+            }
             if ($f->type === FieldType::Reference && $f->references === []) {
                 $v[] = "{$where}: reference field \"{$f->key}\" names no content type";
             }
