@@ -25,14 +25,19 @@ their answers below); the rest still waits.
 | Already encoded relative links fixed; CI for the packages | gllhub-packages#6 | `d0a5886` | 2026-11-05 |
 | Integration branch renamed from `next` to `dev`, image `:dev` | gll-hub#7 | `211c11a` | 2026-11-05 |
 | This plan | gll-hub#6 | `ba8438c` | 2026-11-05 |
+| ADR 0004 proposed, then accepted; the decisions of 2026-11-09 | gll-hub#10 | `27a5749` | 2026-11-09 |
+| Levels of a language as a list (A6) | gllhub-packages#8 | `68d7565` | 2026-11-09 |
+| ADR 0004 phase 1: `refusal`, contract 1.1.0, status `partial`, full sync while partial | gll-hub#12 | `8f7528f` | 2026-11-09 |
+| ADR 0004 phase 2: `github`, `json-resume` and `medium` send their reasons | gllhub-packages#9 | `8a63ef2` | 2026-11-09 |
 
 ### Open
 
-- gll-hub#10: this update and [ADR 0004](adr/0004-a-refused-entry-carries-its-reason.md), status proposed.
+- gll-hub: the pull request that carries this update.
 - gll-hub#11: A4, housekeeping, approved on 2026-11-09. Suites green: core 243, contract 16; `composer audit` clean.
   Left for the user: the `welcome` view (it serves `/`, so removing it means deciding what `/` does), `laravel/sanctum`
   now unused, and the description and license of `gllhub-packages` on GitHub.
-- gllhub-packages#8: the levels of a language served as a list, decided on 2026-11-09 (A6). 141 tests green.
+
+Verified on 2026-11-09, before each merge: core 253 tests, contract 20, packages 144, CI green.
 
 ### Verified on 2026-11-05
 
@@ -71,7 +76,14 @@ action dropped, this is the only place such a mistake can surface.
   ADR**, and it needs a decision on its shape (D2).
 - **ADR accepted on 2026-11-09:** [ADR 0004](adr/0004-a-refused-entry-carries-its-reason.md), a `refusal` field on
   `ExternalEntry` (contract 1.1.0) and a status `partial`. Its phased plan is the plan of A1; phase 1 (core and
-  contract) comes first, in gll-hub#12.
+  contract) comes first.
+- **Phases 1 and 2 merged on 2026-11-09:** gll-hub#12 and gllhub-packages#9. Still to do:
+  - phase 3, the real check: a broken `showcase.md` where the source reads it (the latest release, or the default
+    branch), a sync, the reason in the admin and the page still online. It changes a real repository on GitHub, so it
+    waits for the user's go-ahead;
+  - the packages declare contract `1.1` in their manifests, which the core checks, but their `composer.json` still
+    require `gllhub/contracts` `^1.0`, and the workspace and the core alias the contract as `1.0.x-dev`. Raising both
+    to 1.1 is one coordinated change, and the core's lock must come from a clean checkout.
 - **Amended on 2026-11-09:** while an instance is `partial`, every sync of it runs over everything, so a webhook that
   syncs one entry cannot set it back to `ok` and hide the refusals.
 
@@ -145,7 +157,7 @@ keys, so the levels of a language were first made four flat fields of the item.
 **Changed on 2026-11-09:** the user chose the shape of the site's contract 0.3.0, a list
 `languages[].levels: [{ skill, level }]`, with `skill` one of `reading`, `writing`, `listening`, `speaking` and `level`
 from `A1` to `C2`. A list of items is a list inside a list, which works at any depth. The flat fields are replaced, not
-kept beside the list. The change is gllhub-packages#8, open.
+kept beside the list. The change is gllhub-packages#8, merged on 2026-11-09.
 
 - `resume`: `work[].employment_type`, `work[].skills[]`, `education[].skills[]`, `languages[]` with `levels[]`,
   `interests[]`. `skills` and `interests` share one shape, `{ name, keywords }`.
