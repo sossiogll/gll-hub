@@ -11,6 +11,7 @@ use Gll\Hub\Contracts\Http\HttpClient;
 use Gll\Hub\Contracts\Http\HttpResponse;
 use Illuminate\Http\Client\Factory;
 use Illuminate\Http\Client\HttpClientException;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Carbon;
 use Psr\Log\LoggerInterface;
 
@@ -57,10 +58,10 @@ final class LaravelHttpClient implements HttpClient
         $status = $response->status();
         $at = $this->where($url);
 
-        if ($status === 429) {
-            $this->logger->warning('Rate limited', ['url' => $at]);
+        if ($this->isRateLimited($response)) {
+            $this->logger->warning('Rate limited', ['url' => $at, 'status' => $status]);
 
-            throw new RateLimited($this->retryAfter($response->header('Retry-After')), "{$at} asked to slow down");
+            throw new RateLimited($this->retryAfter($response), "{$at} asked to slow down");
         }
         if ($status === 401 || $status === 403) {
             throw new InvalidCredentials("{$at} refused the credentials ({$status})");
@@ -79,20 +80,43 @@ final class LaravelHttpClient implements HttpClient
         return new HttpResponse($status, $response->body(), $lower);
     }
 
-    /** Retry-After is seconds or an HTTP date; anything else, or a date in the past, falls back to the default. */
-    private function retryAfter(string $header): int
+    /**
+     * A 429 always is. A 403 is when it says so: some services refuse with 403 once a quota is spent,
+     * and that is a wait, not refused credentials. It says so with Retry-After, or with an empty
+     * X-RateLimit-Remaining and the X-RateLimit-Reset it will refill at.
+     */
+    private function isRateLimited(Response $response): bool
     {
-        $default = (int) config('gllhub.http.default_retry_after');
-        $header = trim($header);
-
-        if ($header !== '' && ctype_digit($header)) {
-            return max(1, (int) $header);
+        if ($response->status() === 429) {
+            return true;
         }
-        $at = $header === '' ? false : strtotime($header);
 
-        $now = Carbon::now()->getTimestamp();
+        return $response->status() === 403
+            && ($response->header('Retry-After') !== ''
+                || ($response->header('X-RateLimit-Remaining') === '0' && ctype_digit($response->header('X-RateLimit-Reset'))));
+    }
 
-        return $at !== false && $at > $now ? $at - $now : $default;
+    /**
+     * Seconds to wait: Retry-After (seconds or an HTTP date), else the moment X-RateLimit-Reset names
+     * (epoch seconds). Anything else, or a moment already past, falls back to the default.
+     */
+    private function retryAfter(Response $response): int
+    {
+        $after = trim($response->header('Retry-After'));
+        $reset = trim($response->header('X-RateLimit-Reset'));
+
+        if (ctype_digit($after)) {
+            return max(1, (int) $after);
+        }
+
+        $at = match (true) {
+            $after !== '' => strtotime($after),
+            ctype_digit($reset) => (int) $reset,
+            default => false,
+        };
+        $wait = $at === false ? 0 : $at - Carbon::now()->getTimestamp();
+
+        return $wait > 0 ? $wait : (int) config('gllhub.http.default_retry_after');
     }
 
     /** @param array<string, string> $headers */
