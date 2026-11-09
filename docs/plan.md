@@ -288,7 +288,8 @@ All on 2026-11-05 unless dated. Each covers what it says and no more.
   0.3.0. This replaces the four flat fields approved on 2026-11-05.
 - 2026-11-09, on the open questions of ADR 0004 (they do not accept the ADR): `gllhub:sync` exits with a code of its
   own on `partial`; the summary keeps the first 5 refusals, then "and N more"; the dashboard is enough, no notification
-  for now. Whether `gllhub/medium` joins phase 2 is still open.
+  for now. `gllhub/medium` joins phase 2: a feed item with a `guid` but no `link` becomes a refused entry instead
+  of being skipped in silence.
 
 ## Not doing
 

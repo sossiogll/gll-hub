@@ -101,6 +101,9 @@ To be taken by the user.
    `InvalidShowcase`; the package declares contract 1.1. Test: a broken front matter yields an entry whose
    `refusal` is the parser's message.
 3. **`gllhub/json-resume`**, the same pull request: `ResumeEntry::refused()` takes the reason from `InvalidResume`.
+   **`gllhub/medium`**, the same pull request: a feed item with a `guid` but no `link` is returned as a refused
+   entry with that reason, instead of being skipped in silence. An item with no `guid` has no identity and cannot be
+   an entry: it is named in a warning in the log. Tests for both cases.
 4. **A real check** in the local stack: break `showcase.md` on a branch the source reads, sync, and see the reason
    in the admin while the page still answers.
 
@@ -115,10 +118,7 @@ taken.
   failure that was recommended.
 - **The cap of the summary in `last_error`:** the first 5 refusals, then "and N more", as recommended.
 - **Notifying on `partial`:** the admin's dashboard is enough for now.
-
-## Open questions
-
-- **`gllhub/medium`.** Its feed parser skips, without a word, an item with no `guid` or no `link`. That is a list
-  cut in silence. With a `guid` the item has an identity, so it could be returned as a refused entry; without one it
-  cannot be an entry at all, and only a log line can name it. Whether `medium` joins phase 2 is the user's call.
-- **`gllhub/portfolio`** declares content types and reads nothing, so it has nothing to refuse.
+- **`gllhub/medium` joins phase 2.** Its feed parser skips, without a word, an item with no `guid` or no `link`: a
+  list cut in silence. With a `guid` the item has an identity and becomes a refused entry; without one only a log
+  line can name it.
+- **`gllhub/portfolio`** declares content types and reads nothing, so it has nothing to refuse and does not change.
