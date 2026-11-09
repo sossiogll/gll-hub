@@ -2,7 +2,7 @@
 
 Date: 2026-11-09
 
-Status: proposed
+Status: accepted (2026-11-09)
 
 ## Context
 
@@ -77,7 +77,8 @@ Option 1 for the reason (a `refusal` field, contract 1.1.0) and option 1 for the
 
 ## Decision
 
-To be taken by the user.
+Accepted by the user on 2026-11-09: option 1 for the reason (a `refusal` field on `ExternalEntry`, contract 1.1.0)
+and option 1 for the run (status `partial`), with the answers below. `gllhub/medium` joins phase 2.
 
 ## Consequences
 
@@ -111,8 +112,7 @@ The core's pull request is merged first; the packages' one declares the new mino
 
 ## Answers of the user (2026-11-09)
 
-They answer the questions this proposal left open. They do not accept the ADR: the Decision above is still to be
-taken.
+They answer the questions this proposal left open, and were given before the user accepted it.
 
 - **Exit code of `gllhub:sync` on `partial`:** a code of its own for "finished with refusals", not the generic
   failure that was recommended.

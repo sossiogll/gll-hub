@@ -69,8 +69,9 @@ action dropped, this is the only place such a mistake can surface.
 - In `gllhub/github` and `gllhub/json-resume`: an unreadable file today reaches the core as an empty title, so the admin
   would say "empty title". The reason must travel through the contract. **It touches the contract, so it starts as an
   ADR**, and it needs a decision on its shape (D2).
-- **ADR proposed on 2026-11-09:** [ADR 0004](adr/0004-a-refused-entry-carries-its-reason.md) recommends a `refusal`
-  field on `ExternalEntry` (contract 1.1.0) and a status `partial`. No code until the user accepts it.
+- **ADR accepted on 2026-11-09:** [ADR 0004](adr/0004-a-refused-entry-carries-its-reason.md), a `refusal` field on
+  `ExternalEntry` (contract 1.1.0) and a status `partial`. Its phased plan is the plan of A1; phase 1 (core and
+  contract) comes first.
 
 Done when: a broken `showcase.md` in a real sync shows its reason in the admin, and the old page stays online.
 
@@ -243,7 +244,7 @@ B does not depend on A, except for step 7 in production. It can run first, local
 
 | # | Decision | Recommendation |
 | --- | --- | --- |
-| D2 | A1: how a refused file's reason reaches the admin | Accept [ADR 0004](adr/0004-a-refused-entry-carries-its-reason.md): a `refusal` field on `ExternalEntry`, status `partial` |
+| D2 | A1: how a refused file's reason reaches the admin | Settled on 2026-11-09: [ADR 0004](adr/0004-a-refused-entry-carries-its-reason.md) accepted |
 | D3 | Rate limit for the site | Decide with real traffic, in A3 |
 | D4 | Canonical of a project | Send none |
 | D5 | The about page | Written in the admin for now |
@@ -290,6 +291,7 @@ All on 2026-11-05 unless dated. Each covers what it says and no more.
   own on `partial`; the summary keeps the first 5 refusals, then "and N more"; the dashboard is enough, no notification
   for now. `gllhub/medium` joins phase 2: a feed item with a `guid` but no `link` becomes a refused entry instead
   of being skipped in silence.
+- 2026-11-09: ADR 0004 accepted, with those answers. It covers the ADR and its phased plan, starting from phase 1.
 
 ## Not doing
 
