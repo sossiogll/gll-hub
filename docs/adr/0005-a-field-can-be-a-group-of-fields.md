@@ -2,7 +2,7 @@
 
 Date: 2026-11-09
 
-Status: proposed (2026-11-09)
+Status: accepted (2026-11-09)
 
 ## Context
 
@@ -83,7 +83,8 @@ Option 1.
 
 ## Decision
 
-To be taken by Sossio.
+Option 1, `FieldType::Group`, with the shape above: accepted by Sossio on 2026-11-09 ("Yes, I accept"). The name
+stays `Group`.
 
 ## Consequences
 
@@ -95,7 +96,7 @@ To be taken by Sossio.
 
 ## Plan
 
-1. Sossio accepts this ADR, or changes it.
+1. Sossio accepts this ADR (done, 2026-11-09).
 2. gll-hub, one pull request to `dev`: contract 1.2.0 and the core.
 3. gllhub-packages, one pull request after it: the `resume` type and `json-resume`, declaring contracts 1.2. Merged
    after the core, since a core on 1.1 would refuse it.
@@ -103,5 +104,4 @@ To be taken by Sossio.
 
 ## Open questions
 
-- **The name.** `Group` says what the admin shows. `Object` would say what the API serves, but it is a reserved word in
-  many languages and says little to whoever edits a type.
+None. The name was the only one: accepted as `Group`, the name it was proposed with.

@@ -32,9 +32,9 @@ their answers below); the rest still waits.
 
 ### Open
 
-- ADR 0005 proposed on 2026-11-09: a field can be a group of fields (`FieldType::Group`, contract 1.2.0), for the
+- ADR 0005 proposed and accepted on 2026-11-09: a field can be a group of fields (`FieldType::Group`, contract 1.2.0), for the
   CV's graph that the site's ADR 0003 (accepted 2026-11-09) declares in the file. Sossio chose a new type in the core
-  over two lists on the same day. Nothing is built until it is accepted.
+  over two lists on the same day. Next: one pull request here (contract 1.2.0 and core), then gllhub-packages.
 - gll-hub: the pull request that carries this update.
 - gll-hub#11: A4, housekeeping, approved on 2026-11-09. Suites green: core 243, contract 16; `composer audit` clean.
   Left for the user: the `welcome` view (it serves `/`, so removing it means deciding what `/` does), `laravel/sanctum`
