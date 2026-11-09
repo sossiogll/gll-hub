@@ -5,11 +5,15 @@ declare(strict_types=1);
 namespace App\Sync\Console;
 
 use App\Models\SourceInstance;
+use App\Models\SyncStatus;
 use App\Sync\SyncSourceInstance;
 use Illuminate\Console\Command;
 
 final class SyncCommand extends Command
 {
+    /** Finished, but refused some entries: not a success and not a failure. */
+    public const PARTIAL = 3;
+
     protected $signature = 'gllhub:sync {instance? : The id of a source instance} {--all : Every enabled instance}';
 
     protected $description = 'Sync a source instance now, waiting for the result';
@@ -34,19 +38,31 @@ final class SyncCommand extends Command
         }
 
         $failed = false;
+        $partial = false;
         foreach ($instances as $instance) {
             SyncSourceInstance::dispatchSync($instance->id);
             $instance->refresh();
 
             $line = "#{$instance->id} {$instance->label}: {$instance->status->value}";
-            if ($instance->status->value === 'ok') {
-                $this->info($line);
-            } else {
-                $failed = true;
-                $this->error($line . ($instance->last_error === null ? '' : " ({$instance->last_error})"));
+            $detail = $instance->last_error === null ? '' : " ({$instance->last_error})";
+            switch ($instance->status) {
+                case SyncStatus::Ok:
+                    $this->info($line);
+                    break;
+                case SyncStatus::Partial:
+                    $partial = true;
+                    $this->warn($line . $detail);
+                    break;
+                default:
+                    $failed = true;
+                    $this->error($line . $detail);
             }
         }
 
-        return $failed ? self::FAILURE : self::SUCCESS;
+        return match (true) {
+            $failed => self::FAILURE,
+            $partial => self::PARTIAL,
+            default => self::SUCCESS,
+        };
     }
 }

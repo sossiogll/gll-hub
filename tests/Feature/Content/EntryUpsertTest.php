@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Content;
 
+use App\Sync\SyncReport;
 use App\Content\SlugAllocator;
 use App\Content\ReferenceStore;
 use App\Models\Entry;
@@ -270,10 +271,11 @@ final class EntryUpsertTest extends HubTestCase
 
         $this->assertSame(1, $report->created);
         $this->assertSame(['good'], Entry::pluck('external_id')->all());
-        $this->assertSame(['bad', 'worse'], array_keys($report->invalid));
-        $this->assertStringContainsString('required field "isbn" is missing', $report->invalid['bad'][0]);
-        $this->assertStringContainsString('"film" is not in the source\'s produces', $report->invalid['worse'][0]);
-        $this->assertStringContainsString('2 skipped', $report->summary());
+        $this->assertSame(['bad', 'worse'], array_map(fn ($r) => $r->externalId, $report->refusals));
+        $this->assertSame([SyncReport::REFUSED_BY_RULES, SyncReport::REFUSED_BY_RULES], array_map(fn ($r) => $r->code, $report->refusals));
+        $this->assertStringContainsString('required field "isbn" is missing', $report->refusals[0]->reasons[0]);
+        $this->assertStringContainsString('"film" is not in the source\'s produces', $report->refusals[1]->reasons[0]);
+        $this->assertStringContainsString('2 refused', $report->summary());
     }
 
     public function test_an_entry_the_source_stopped_listing_comes_back_when_it_is_listed_again(): void

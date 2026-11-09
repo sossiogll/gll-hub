@@ -24,6 +24,7 @@ final readonly class ExternalEntry
      * @param list<RemoteMedia> $media
      * @param list<ExternalRef> $references
      * @param string|null $fingerprint changes when the content changes (an ETag, a commit SHA, a hash); the core skips unchanged entries
+     * @param string|null $refusal set by a source that saw the item but could not read it; the core keeps what it has and reports the reason
      */
     public function __construct(
         public string $externalId,
@@ -42,6 +43,7 @@ final readonly class ExternalEntry
         public ?string $canonicalUrl = null,
         public ?string $fingerprint = null,
         public BodyFormat $bodyFormat = BodyFormat::Markdown,
+        public ?string $refusal = null,
     ) {
     }
 }

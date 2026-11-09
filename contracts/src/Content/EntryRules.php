@@ -11,7 +11,8 @@ use Gll\Hub\Contracts\Source\SourceDefinition;
  * What makes an ExternalEntry acceptable for the content type it claims. The
  * conformance check runs it on a package's samples; the core runs the very same
  * rules on every entry a source returns, so a package that passes its tests
- * cannot be refused for a reason its tests could not see.
+ * cannot be refused for a reason its tests could not see. An entry that carries a
+ * refusal is judged on its identity and its reason only.
  */
 final class EntryRules
 {
@@ -45,6 +46,14 @@ final class EntryRules
             return [...$v, "{$at}: type \"{$entry->type}\" is not in the source's produces"];
         }
 
+        if (! self::isLanguage($entry->language)) {
+            $v[] = "{$at}: language \"{$entry->language}\" is not a language tag such as \"en\" or \"pt-BR\"";
+        }
+        if ($entry->refusal !== null) {
+            // A refused entry is only an identity and a reason: its title and fields are not meant to be valid.
+            return trim($entry->refusal) === '' ? [...$v, "{$at}: the refusal has no reason"] : $v;
+        }
+
         $type = null;
         foreach ($types as $candidate) {
             if ($candidate->key === $entry->type) {
@@ -60,9 +69,6 @@ final class EntryRules
             $v[] = "{$at}: empty title";
         } elseif (mb_strlen($entry->title) > self::MAX_TITLE) {
             $v[] = "{$at}: title is longer than " . self::MAX_TITLE . ' characters';
-        }
-        if (! self::isLanguage($entry->language)) {
-            $v[] = "{$at}: language \"{$entry->language}\" is not a language tag such as \"en\" or \"pt-BR\"";
         }
         if ($entry->translationKey !== null && strlen($entry->translationKey) > self::MAX_TRANSLATION_KEY) {
             $v[] = "{$at}: translationKey is longer than " . self::MAX_TRANSLATION_KEY . ' bytes';

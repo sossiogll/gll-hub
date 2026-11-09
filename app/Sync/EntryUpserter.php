@@ -25,7 +25,8 @@ use Psr\Log\LoggerInterface;
 
 /**
  * The one way an entry from a source enters the store. An entry that breaks the
- * contract's rules is skipped and reported, never fatal to the run.
+ * contract's rules, or that its source could not read, is reported and left out, never fatal to the run;
+ * what is stored for it stays as it is.
  */
 final class EntryUpserter
 {
@@ -44,13 +45,14 @@ final class EntryUpserter
     {
         $violations = EntryRules::violations($source, array_values($this->registry->contentTypes()), $entry);
         if ($violations !== []) {
-            $report->skipped($entry->externalId, $violations);
-            $this->logger->warning('Entry skipped', [
-                'package' => $instance->package,
-                'instance' => $instance->getKey(),
-                'external_id' => $entry->externalId,
-                'violations' => $violations,
-            ]);
+            $report->refusedByRules($entry->externalId, $entry->language, $violations);
+            $this->logRefusal('Entry refused by the rules', $instance, $entry, ['violations' => $violations]);
+
+            return;
+        }
+        if ($entry->refusal !== null) {
+            $report->refusedBySource($entry->externalId, $entry->language, $entry->refusal);
+            $this->logRefusal('Entry refused by its source', $instance, $entry, ['reason' => $entry->refusal]);
 
             return;
         }
@@ -77,6 +79,18 @@ final class EntryUpserter
         foreach ($entry->media as $media) {
             ImportRemoteMedia::dispatch($id, $media);
         }
+    }
+
+    /** @param array<string, mixed> $why */
+    private function logRefusal(string $message, SourceInstance $instance, ExternalEntry $entry, array $why): void
+    {
+        $this->logger->warning($message, [
+            'package' => $instance->package,
+            'instance' => $instance->getKey(),
+            'external_id' => $entry->externalId,
+            'language' => $entry->language,
+            ...$why,
+        ]);
     }
 
     /**

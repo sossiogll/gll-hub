@@ -37,6 +37,17 @@ final class InstanceHealth
         ])->save();
     }
 
+    /** @param string $summary the refused entries and why, as SyncReport::refusalSummary() words them */
+    public function partial(SourceInstance $instance, string $summary): void
+    {
+        $instance->forceFill([
+            'status' => SyncStatus::Partial,
+            'last_success_at' => Carbon::now('UTC'),
+            'last_error' => $summary,
+            'retry_after' => null,
+        ])->save();
+    }
+
     public function failed(SourceInstance $instance, Failure $failure): void
     {
         $instance->forceFill([

@@ -90,6 +90,13 @@ final class SchedulingTest extends HubTestCase
         $this->assertSame([$failed->id], $this->dueIds());
     }
 
+    public function test_a_partial_instance_keeps_being_synced(): void
+    {
+        $partial = $this->makeInstance(attributes: ['status' => SyncStatus::Partial]);
+
+        $this->assertSame([$partial->id], $this->dueIds());
+    }
+
     public function test_the_due_command_queues_a_sync_for_each_due_instance(): void
     {
         Queue::fake();

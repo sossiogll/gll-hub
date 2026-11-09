@@ -117,7 +117,7 @@ class SourceInstanceResource extends Resource
                     ->color(static fn (SyncStatus $state): string => match ($state) {
                         SyncStatus::Ok => 'success',
                         SyncStatus::Pending => 'gray',
-                        SyncStatus::Retrying => 'warning',
+                        SyncStatus::Retrying, SyncStatus::Partial => 'warning',
                         SyncStatus::Failing, SyncStatus::Failed => 'danger',
                     }),
                 TextColumn::make('last_run_at')->label('Last run')->dateTime()->placeholder('Never')->sortable(),
