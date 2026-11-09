@@ -71,7 +71,9 @@ action dropped, this is the only place such a mistake can surface.
   ADR**, and it needs a decision on its shape (D2).
 - **ADR accepted on 2026-11-09:** [ADR 0004](adr/0004-a-refused-entry-carries-its-reason.md), a `refusal` field on
   `ExternalEntry` (contract 1.1.0) and a status `partial`. Its phased plan is the plan of A1; phase 1 (core and
-  contract) comes first.
+  contract) comes first, in gll-hub#12.
+- **Amended on 2026-11-09:** while an instance is `partial`, every sync of it runs over everything, so a webhook that
+  syncs one entry cannot set it back to `ok` and hide the refusals.
 
 Done when: a broken `showcase.md` in a real sync shows its reason in the admin, and the old page stays online.
 
@@ -292,6 +294,7 @@ All on 2026-11-05 unless dated. Each covers what it says and no more.
   for now. `gllhub/medium` joins phase 2: a feed item with a `guid` but no `link` becomes a refused entry instead
   of being skipped in silence.
 - 2026-11-09: ADR 0004 accepted, with those answers. It covers the ADR and its phased plan, starting from phase 1.
+- 2026-11-09: amendment to ADR 0004, a partial instance is always synced over everything. It covers that rule only.
 
 ## Not doing
 
