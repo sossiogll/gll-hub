@@ -28,10 +28,11 @@ their answers below); the rest still waits.
 
 ### Open
 
-- gll-hub: the pull request that carries this update and [ADR 0004](adr/0004-a-refused-entry-carries-its-reason.md),
-  status proposed.
-- gll-hub: A4, housekeeping, approved on 2026-11-09.
-- gllhub-packages: the levels of a language served as a list, decided on 2026-11-09 (A6).
+- gll-hub#10: this update and [ADR 0004](adr/0004-a-refused-entry-carries-its-reason.md), status proposed.
+- gll-hub#11: A4, housekeeping, approved on 2026-11-09. Suites green: core 243, contract 16; `composer audit` clean.
+  Left for the user: the `welcome` view (it serves `/`, so removing it means deciding what `/` does), `laravel/sanctum`
+  now unused, and the description and license of `gllhub-packages` on GitHub.
+- gllhub-packages#8: the levels of a language served as a list, decided on 2026-11-09 (A6). 141 tests green.
 
 ### Verified on 2026-11-05
 
@@ -141,7 +142,7 @@ keys, so the levels of a language were first made four flat fields of the item.
 **Changed on 2026-11-09:** the user chose the shape of the site's contract 0.3.0, a list
 `languages[].levels: [{ skill, level }]`, with `skill` one of `reading`, `writing`, `listening`, `speaking` and `level`
 from `A1` to `C2`. A list of items is a list inside a list, which works at any depth. The flat fields are replaced, not
-kept beside the list. The change is in a pull request on `gllhub-packages`, open.
+kept beside the list. The change is gllhub-packages#8, open.
 
 - `resume`: `work[].employment_type`, `work[].skills[]`, `education[].skills[]`, `languages[]` with `levels[]`,
   `interests[]`. `skills` and `interests` share one shape, `{ name, keywords }`.
@@ -285,6 +286,9 @@ All on 2026-11-05 unless dated. Each covers what it says and no more.
 - 2026-11-09: A1 approved as an ADR only. Its code waits for the user to accept the ADR.
 - 2026-11-09: the levels of a language are served as a list `levels: [{ skill, level }]`, as in the site's contract
   0.3.0. This replaces the four flat fields approved on 2026-11-05.
+- 2026-11-09, on the open questions of ADR 0004 (they do not accept the ADR): `gllhub:sync` exits with a code of its
+  own on `partial`; the summary keeps the first 5 refusals, then "and N more"; the dashboard is enough, no notification
+  for now. Whether `gllhub/medium` joins phase 2 is still open.
 
 ## Not doing
 

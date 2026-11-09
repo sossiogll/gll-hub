@@ -54,7 +54,7 @@ Constraints that are not negotiable:
    the run did finish; `last_error` holds a summary of the refused entries and their reasons; no retry is scheduled,
    because a mistake in content does not fix itself, and the next scheduled run looks again. The dashboard widget
    lists `partial` with the other states that need attention. `gllhub:sync` prints the summary and exits with
-   failure.
+   a code of its own for "finished with refusals", distinct from success and from failure.
 2. **Keep `ok`, and store refusals in a table of their own.** Rejected for now: a table, a migration and a screen,
    for what is a handful of lines on a personal site. The column can become a table later without changing the
    contract.
@@ -83,7 +83,8 @@ To be taken by the user.
 
 - A broken `showcase.md` shows, in the admin's `last_error`, the repository, the language and the parser's reason,
   and the old page stays online.
-- `gllhub:sync` no longer says `ok` when it refused something. A script that runs it sees a failure.
+- `gllhub:sync` no longer says `ok` when it refused something. A script that runs it sees a code of its own,
+  and can tell "finished with refusals" from a run that failed.
 - The rules' own refusals (an entry a package built wrongly) and a package's refusals (a file it could not read)
   are told apart: the summary prefixes them with stable codes, `refused_by_source` and `refused_by_rules`.
 - A package built on contract 1.0 keeps working and keeps sending empty titles. Its refusals still surface, as
@@ -105,11 +106,19 @@ To be taken by the user.
 
 The core's pull request is merged first; the packages' one declares the new minor and cannot run on an older core.
 
+## Answers of the user (2026-11-09)
+
+They answer the questions this proposal left open. They do not accept the ADR: the Decision above is still to be
+taken.
+
+- **Exit code of `gllhub:sync` on `partial`:** a code of its own for "finished with refusals", not the generic
+  failure that was recommended.
+- **The cap of the summary in `last_error`:** the first 5 refusals, then "and N more", as recommended.
+- **Notifying on `partial`:** the admin's dashboard is enough for now.
+
 ## Open questions
 
-- **Exit code of `gllhub:sync` on `partial`.** Recommended: failure, so a script notices. The alternative is a
-  distinct code for "finished with refusals".
-- **The cap of the summary in `last_error`.** Recommended: the first 5 refusals, then "and N more".
-- **Should `partial` notify** anyone (mail), or is the admin's dashboard enough? Recommended: the dashboard, until the
-  site is in production.
-- **`gllhub/medium` and `gllhub/portfolio`** do not refuse files today. They need no change; confirm none is planned.
+- **`gllhub/medium`.** Its feed parser skips, without a word, an item with no `guid` or no `link`. That is a list
+  cut in silence. With a `guid` the item has an identity, so it could be returned as a refused entry; without one it
+  cannot be an entry at all, and only a log line can name it. Whether `medium` joins phase 2 is the user's call.
+- **`gllhub/portfolio`** declares content types and reads nothing, so it has nothing to refuse.
