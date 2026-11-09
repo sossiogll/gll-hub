@@ -32,6 +32,9 @@ their answers below); the rest still waits.
 
 ### Open
 
+- ADR 0005 proposed on 2026-11-09: a field can be a group of fields (`FieldType::Group`, contract 1.2.0), for the
+  CV's graph that the site's ADR 0003 (accepted 2026-11-09) declares in the file. Sossio chose a new type in the core
+  over two lists on the same day. Nothing is built until it is accepted.
 - gll-hub: the pull request that carries this update.
 - gll-hub#11: A4, housekeeping, approved on 2026-11-09. Suites green: core 243, contract 16; `composer audit` clean.
   Left for the user: the `welcome` view (it serves `/`, so removing it means deciding what `/` does), `laravel/sanctum`
@@ -165,6 +168,10 @@ kept beside the list. The change is gllhub-packages#8, merged on 2026-11-09.
 - Pull request: gllhub-packages#7. Checked through the real upserter and API on the local stack.
 - Still to do, with the user: add the new keys to `sossiogll/curriculum.json`. Their values are the user's to give; the
   file only gains `languages` today. The site's contract already has the list of levels: no change there.
+- **2026-11-09:** the graph of the CV is declared in the file (site's ADR 0003, accepted). gllHub serves it as one
+  `timeline` field with `branches` and `rows`, which needs a group type: [ADR 0005](adr/0005-a-field-can-be-a-group-of-fields.md),
+  proposed. After it: the core and contract 1.2.0, then `resume` gains `id` on items and `timeline`, and `json-resume`
+  checks the references.
 
 ### Definition of closed
 
