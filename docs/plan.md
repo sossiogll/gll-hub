@@ -1,10 +1,11 @@
 # Plan: closing gllHub, and gllHub in its own showcase
 
-State on 2026-11-05. This file is the source of truth for the remaining work, and it is updated while working, not at
+State on 2026-11-09. This file is the source of truth for the remaining work, and it is updated while working, not at
 the end. Decisions are in `docs/adr/`, rules in `CLAUDE.md`, how things work in the READMEs.
 
 The system works and can be tested end to end. **On 2026-11-05 the user stopped new refinements until this plan is
-approved:** nothing below starts without their go-ahead.
+approved:** nothing below starts without their go-ahead. On 2026-11-09 they approved A4, and A1 as an ADR only (see
+their answers below); the rest still waits.
 
 - Part A closes gllHub: from "works locally" to "running in production, with its loose ends decided".
 - Part B puts gllHub in the showcase of the site, as was done for Musizeer. It changes repositories on GitHub, not code,
@@ -27,7 +28,11 @@ approved:** nothing below starts without their go-ahead.
 
 ### Open
 
-No pull request is open on `gll-hub` or `gllhub-packages`, except the one that carries this update.
+- gll-hub#10: this update and [ADR 0004](adr/0004-a-refused-entry-carries-its-reason.md), status proposed.
+- gll-hub#11: A4, housekeeping, approved on 2026-11-09. Suites green: core 243, contract 16; `composer audit` clean.
+  Left for the user: the `welcome` view (it serves `/`, so removing it means deciding what `/` does), `laravel/sanctum`
+  now unused, and the description and license of `gllhub-packages` on GitHub.
+- gllhub-packages#8: the levels of a language served as a list, decided on 2026-11-09 (A6). 141 tests green.
 
 ### Verified on 2026-11-05
 
@@ -64,6 +69,9 @@ action dropped, this is the only place such a mistake can surface.
 - In `gllhub/github` and `gllhub/json-resume`: an unreadable file today reaches the core as an empty title, so the admin
   would say "empty title". The reason must travel through the contract. **It touches the contract, so it starts as an
   ADR**, and it needs a decision on its shape (D2).
+- **ADR accepted on 2026-11-09:** [ADR 0004](adr/0004-a-refused-entry-carries-its-reason.md), a `refusal` field on
+  `ExternalEntry` (contract 1.1.0) and a status `partial`. Its phased plan is the plan of A1; phase 1 (core and
+  contract) comes first.
 
 Done when: a broken `showcase.md` in a real sync shows its reason in the admin, and the old page stays online.
 
@@ -126,18 +134,23 @@ inventory of what b5srl.eu really uses, because "identical API v1" would bring a
 keeps free of it, and where it goes has to be decided first (D10). Until then, `master` stays frozen, and nothing merges into
 it.
 
-### A6. The full CV (approved 2026-11-05, in progress)
+### A6. The full CV (approved 2026-11-05, in progress; levels changed 2026-11-09)
 
 The site asked for nested fields on the `resume` type. Answer given the same day: lists inside lists work at any depth,
 and `required`, enums and undeclared keys are checked at every depth during a sync. There is no type for a group of fixed
-keys, so the levels of a language are four flat fields of the item.
+keys, so the levels of a language were first made four flat fields of the item.
 
-- `resume`: `work[].employment_type`, `work[].skills[]`, `education[].skills[]`, `languages[]` with `reading`, `writing`,
-  `listening` and `speaking`, `interests[]`. `skills` and `interests` share one shape, `{ name, keywords }`.
+**Changed on 2026-11-09:** the user chose the shape of the site's contract 0.3.0, a list
+`languages[].levels: [{ skill, level }]`, with `skill` one of `reading`, `writing`, `listening`, `speaking` and `level`
+from `A1` to `C2`. A list of items is a list inside a list, which works at any depth. The flat fields are replaced, not
+kept beside the list. The change is gllhub-packages#8, open.
+
+- `resume`: `work[].employment_type`, `work[].skills[]`, `education[].skills[]`, `languages[]` with `levels[]`,
+  `interests[]`. `skills` and `interests` share one shape, `{ name, keywords }`.
 - `gllhub/json-resume` reads them, the keys outside the JSON Resume schema included (`employmentType`, `skills`, `levels`).
 - Pull request: gllhub-packages#7. Checked through the real upserter and API on the local stack.
 - Still to do, with the user: add the new keys to `sossiogll/curriculum.json`. Their values are the user's to give; the
-  file only gains `languages` today. The site updates its contract.
+  file only gains `languages` today. The site's contract already has the list of levels: no change there.
 
 ### Definition of closed
 
@@ -231,7 +244,7 @@ B does not depend on A, except for step 7 in production. It can run first, local
 
 | # | Decision | Recommendation |
 | --- | --- | --- |
-| D2 | A1: how a refused file's reason reaches the admin | ADR first, an optional capability in the contract |
+| D2 | A1: how a refused file's reason reaches the admin | Settled on 2026-11-09: [ADR 0004](adr/0004-a-refused-entry-carries-its-reason.md) accepted |
 | D3 | Rate limit for the site | Decide with real traffic, in A3 |
 | D4 | Canonical of a project | Send none |
 | D5 | The about page | Written in the admin for now |
@@ -270,6 +283,15 @@ All on 2026-11-05 unless dated. Each covers what it says and no more.
   other decisions stay as they are.
 - No more refinements until this plan is approved.
 - The full CV approved as phase A6, with the levels of a language as four flat fields, as recommended.
+- 2026-11-09: A4 approved. It covers A4 as written, and no other phase.
+- 2026-11-09: A1 approved as an ADR only. Its code waits for the user to accept the ADR.
+- 2026-11-09: the levels of a language are served as a list `levels: [{ skill, level }]`, as in the site's contract
+  0.3.0. This replaces the four flat fields approved on 2026-11-05.
+- 2026-11-09, on the open questions of ADR 0004 (they do not accept the ADR): `gllhub:sync` exits with a code of its
+  own on `partial`; the summary keeps the first 5 refusals, then "and N more"; the dashboard is enough, no notification
+  for now. `gllhub/medium` joins phase 2: a feed item with a `guid` but no `link` becomes a refused entry instead
+  of being skipped in silence.
+- 2026-11-09: ADR 0004 accepted, with those answers. It covers the ADR and its phased plan, starting from phase 1.
 
 ## Not doing
 
